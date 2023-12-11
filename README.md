@@ -10,7 +10,7 @@ Tools that are compared include:
 
 Vertical Integration:
 - [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
-2. SnapCCESS  
+- [SnapCCESS](https://github.com/PYangLab/SnapCCESS) v0.2.1
 
 3. Concerto 
 
@@ -43,6 +43,9 @@ Vertical Integration:
 18. scMM
 
 Diagonal Integration:
+
+
+
 
 Mosaic Integration:
 
