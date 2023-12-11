@@ -7,7 +7,7 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 
 ## Integration Tools
 
-In this benchmark, we evaluated 34 integration methods across the four data integration categories on 53 datasets. In particular, we include 17 vertical integration methods, 11 diagonal integration tools, 7 mosaic integration tools, and 14 cross integration tools. Tools that are compared include:
+In this benchmark, we evaluated 34 integration methods across the four data integration categories on 53 datasets. In particular, we include 17 vertical integration methods, 11 diagonal integration tools, 7 mosaic integration tools, and 14 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
 
 Vertical Integration:
 - [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
@@ -57,7 +57,7 @@ Cross Integration:
 - [sciPENN](https://github.com/jlakkis/sciPENN) v1.0.0
 - [Concerto](https://github.com/melobio/Concerto-reproducibility) Github Version: ab1fc7f
 - [scMDC](https://github.com/xianglin226/scMDC/tree/v1.0.0) Github Version:  43b0c3a
-- [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8）
+- [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8
 - [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
 - [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
@@ -66,4 +66,3 @@ Cross Integration:
 - [eggplant](https://github.com/almaan/eggplant) v0.2.3
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
 
-## Metrics
