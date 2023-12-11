@@ -11,26 +11,16 @@ Tools that are compared include:
 Vertical Integration:
 - [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
 - [SnapCCESS](https://github.com/PYangLab/SnapCCESS) v0.2.1
-
-3. Concerto 
-
-4. totalVI
-
-5. Seurat_WNN
-
-6. scMSI
-
-7. moETM 
-
-8. MOFA 
-
-9. Multigrate
-
-10. scMoMaT
-
-11. UNIMF 
-
-12. sciPENN 
+- [Concerto](https://github.com/melobio/Concerto-reproducibility)
+- [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html)
+- [Seurat_WNN](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
+- [scMSI](https://github.com/ChengmingZhang-CAS/scMSI-master)
+- [moETM]( 
+- [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
+- [Multigrate](
+- [scMoMaT](
+- [UNIMF]( 
+- [sciPENN]( 
 
 13. MIRA
 
