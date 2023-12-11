@@ -42,15 +42,28 @@ Diagonal Integration:
 - [MultiMAP](https://github.com/Teichlab/MultiMAP) v0.0.1
 
 Mosaic Integration:
-
 - [MultiVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html) v0.20.3
 - [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8
 - [Cobolt](https://github.com/epurdom/cobolt) v1.0.1
-- [Seurat v5]([https://satijalab.org/seurat/articles/seurat5_atacseq_integration_vignette](https://satijalab.org/seurat/articles/seurat5_integration_bridge)) v4.1.1.9001 
+- [Seurat v5](https://satijalab.org/seurat/articles/seurat5_integration_bridge)) v4.1.1.9001 
 - [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
 - [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
 
 Cross Integration:
+- [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v0.20.3
+- [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
+- [UnitedNet](https://github.com/LiuLab-Bioelectronics-Harvard/UnitedNet) Github Version: 3689da8
+- [sciPENN](https://github.com/jlakkis/sciPENN) v1.0.0
+- [Concerto](https://github.com/melobio/Concerto-reproducibility) Github Version: ab1fc7f
+- [scMDC](https://github.com/xianglin226/scMDC/tree/v1.0.0) Github Version:  43b0c3a
+- [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8）
+- [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
+- [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
+- [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
+- [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
+- [PASTE](https://github.com/raphael-group/paste) v1.4.0
+- [eggplant](https://github.com/almaan/eggplant) v0.2.3
+- [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
 
 ## Metrics
