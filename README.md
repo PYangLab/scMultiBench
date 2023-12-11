@@ -66,3 +66,6 @@ Cross Integration:
 - [eggplant](https://github.com/almaan/eggplant) v0.2.3
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
 
+## License
+
+This project is covered under the Apache 2.0 License.
