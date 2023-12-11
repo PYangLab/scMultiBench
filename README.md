@@ -8,22 +8,38 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 ## Integration Tools
 Tools that are compared include:
 Vertical Integration:
-Matilda 
-SnapCCESS  
-Concerto 
-totalVI
-Seurat_WNN
-scMSI
-moETM 
-MOFA 
-Multigrate
-scMoMaT
-UNIMF 
-sciPENN 
-MIRA
-iPOLNG
-UnitedNet
-scMDC
+
+1. Matilda 
+
+2. SnapCCESS  
+
+3. Concerto 
+
+4. totalVI
+
+5. Seurat_WNN
+
+6. scMSI
+
+7. moETM 
+
+8. MOFA 
+
+9. Multigrate
+
+10. scMoMaT
+
+11. UNIMF 
+
+12. sciPENN 
+
+13. MIRA
+
+14. iPOLNG
+
+15. UnitedNet
+
+16. scMDC
 
 Diagonal Integration:
 
