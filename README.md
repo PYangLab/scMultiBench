@@ -9,9 +9,7 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 Tools that are compared include:
 
 Vertical Integration:
-
-- [Matilda](https://github.com/Teichlab/bbknn](https://github.com/PYangLab/Matilda) Github Version: 7d71480
-
+- [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
 2. SnapCCESS  
 
 3. Concerto 
