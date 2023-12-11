@@ -7,6 +7,7 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 
 ## Integration Tools
 Tools that are compared include:
+
 Vertical Integration:
 
 1. Matilda 
@@ -40,6 +41,8 @@ Vertical Integration:
 15. UnitedNet
 
 16. scMDC
+    
+18. scMM
 
 Diagonal Integration:
 
