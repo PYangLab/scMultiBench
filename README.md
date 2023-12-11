@@ -10,7 +10,7 @@ Tools that are compared include:
 
 Vertical Integration:
 
-1. Matilda 
+- [Matilda](https://github.com/Teichlab/bbknn](https://github.com/PYangLab/Matilda) Github Version: 7d71480
 
 2. SnapCCESS  
 
