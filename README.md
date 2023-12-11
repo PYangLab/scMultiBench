@@ -43,6 +43,14 @@ Diagonal Integration:
 
 Mosaic Integration:
 
+- [MultiVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html) v0.20.3
+- [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8
+- [Cobolt](https://github.com/epurdom/cobolt) v1.0.1
+- [Seurat v5]([https://satijalab.org/seurat/articles/seurat5_atacseq_integration_vignette](https://satijalab.org/seurat/articles/seurat5_integration_bridge)) v4.1.1.9001 
+- [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
+- [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
+- [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
+
 Cross Integration:
 
 ## Metrics
