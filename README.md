@@ -29,9 +29,17 @@ Vertical Integration:
 - [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
 
 Diagonal Integration:
-
-
-
+- [scBridge](https://github.com/XLearning-SCU/scBridge) Github Version: ff17561
+- [Portal](https://github.com/YangLabHKUST/Portal) v1.0.2
+- [VIPCCA](https://github.com/jhu99/vipcca) v0.2.7
+- [scJoint](https://github.com/SydneyBioX/scJoint)  Github Version: cbbfa5d
+- [SCALEX](https://github.com/jsxlei/SCALEX) v1.0.2
+- [Conos](https://github.com/kharchenkolab/conos) v1.4.6
+- [LIGER](https://github.com/welch-lab/liger) v2.0.1
+- [iNMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
+- [GLUE](https://github.com/tanlabcode/GLUER) Github Version: 192bb6e
+- [Seurat v3](https://satijalab.org/seurat/articles/seurat5_atacseq_integration_vignette) v4.1.1.9001 
+- [MultiMAP](https://github.com/Teichlab/MultiMAP) v0.0.1
 
 Mosaic Integration:
 
