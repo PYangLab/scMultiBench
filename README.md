@@ -66,6 +66,48 @@ Cross Integration:
 - [eggplant](https://github.com/almaan/eggplant) v0.2.3
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
 
+
+## Evaluation Pipeline
+
+To perform dimension reduction, clustering, and batch correction, we utilize various metrics from the scib package. The primary function employed in 'scib_metric.py' is scib.metrics.metrics, which is used to generating evaluation results: 
+
+```
+metrics = scib.metrics.metrics(
+    adata_unintegrated,
+    adata_integrated,
+    batch_key='batch',
+    label_key= 'celltype',
+    embed='X_emb',
+    ari_=True,
+    nmi_=True,
+    silhouette_=True,
+    graph_conn_= True,
+    pcr_=True,
+    kBET_=True,
+    isolated_labels_asw_=True,
+    isolated_labels_f1_= True,
+    lisi_graph_ = True
+)
+```
+For diagonal, mosaic, and cross integration methods, we use the all the metrics. 
+For vertical integration methods, we only have 1 batch. So we use the following 6 metrics for measuring the dimension reduction and clustering.  
+
+```
+metrics = scib.metrics.metrics(
+    adata_unintegrated,
+    adata_integrated,
+    label_key= 'celltype',
+    embed='X_emb',
+    ari_=True,
+    nmi_=True,
+    silhouette_=True,
+    isolated_labels_asw_=True,
+    isolated_labels_f1_= True,
+    lisi_graph_ = True
+)
+```
+
+
 ## License
 
 This project is covered under the Apache 2.0 License.
