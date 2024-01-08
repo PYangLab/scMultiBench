@@ -89,8 +89,8 @@ metrics = scib.metrics.metrics(
     lisi_graph_ = True
 )
 ```
-For diagonal, mosaic, and cross integration methods, we use the all the metrics. 
-For vertical integration methods, we only have 1 batch. So we use the following 6 metrics for measuring the dimension reduction and clustering.  
+
+For the integration methods classified as diagonal, mosaic, and cross, we employ all available metrics, used for dimension reduction, batch correction, clustering, to ensure comprehensive analysis. Conversely, for vertical integration methods, which involve only a single batch, we selectively utilize six specific metrics. These metrics are primarily focused on assessing the performance of dimension reduction and clustering.
 
 ```
 metrics = scib.metrics.metrics(
