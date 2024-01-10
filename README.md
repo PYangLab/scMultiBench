@@ -107,6 +107,9 @@ metrics = scib.metrics.metrics(
 )
 ```
 
+```
+python scib_metrics_diagonal.py --data_path "./example_data/embedding.h5" --cty_path "./example_data/rna_cty.csv" "./../../../dataset/benchmark_dataset/diagonal integration/dataset18/conos_peak_cty.csv"  --save_path "./../../../result/scib_metric/diagonal integration/dataset18/Conos/" --transpose 0
+```
 
 ## License
 
