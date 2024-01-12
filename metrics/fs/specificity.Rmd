@@ -1,0 +1,53 @@
+```{r}
+library(rhdf5)
+importance_matrix <- h5read("../../example_data/fs/marker_score_rna.h5", "data")
+top5_indices <- list()
+top10_indices <- list()
+top20_indices <- list()
+for (i in 1:ncol(importance_matrix)) {
+    sorted_indices <- order(importance_matrix[,i], decreasing = TRUE)
+    top5_indices[[i]] <- sorted_indices[1:5]
+    top10_indices[[i]] <- sorted_indices[1:10]
+    top20_indices[[i]] <- sorted_indices[1:20]
+}
+
+intersections_top5 <- list()
+# Calculate intersections for every pair of elements in top5_indices
+for (i in 1:(length(top5_indices) - 1)) {
+    for (j in (i + 1):length(top5_indices)) {
+        # Compute intersection
+        intersection <- intersect(top5_indices[[i]], top5_indices[[j]])
+        # Store result with a descriptive name
+        name <- paste("Intersection", i, "and", j)
+        intersections_top5[[name]] <- intersection
+    }
+}
+print(intersections_top5)
+
+intersections_top10 <- list()
+# Calculate intersections for every pair of elements in top5_indices
+for (i in 1:(length(top10_indices) - 1)) {
+    for (j in (i + 1):length(top10_indices)) {
+        # Compute intersection
+        intersection <- intersect(top10_indices[[i]], top10_indices[[j]])
+        # Store result with a descriptive name
+        name <- paste("Intersection", i, "and", j)
+        intersections_top10[[name]] <- intersection
+    }
+}
+print(intersections_top10)
+
+intersections_top20 <- list()
+# Calculate intersections for every pair of elements in top5_indices
+for (i in 1:(length(top20_indices) - 1)) {
+    for (j in (i + 1):length(top20_indices)) {
+        # Compute intersection
+        intersection <- intersect(top20_indices[[i]], top20_indices[[j]])
+        # Store result with a descriptive name
+        name <- paste("Intersection", i, "and", j)
+        intersections_top20[[name]] <- intersection
+    }
+}
+print(intersections_top20)
+```
+

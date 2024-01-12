@@ -1,0 +1,100 @@
+```{r}
+# MSE computation
+imputed_data <- h5read("../../example_data/imputation/imputed_data.h5", "matrix/data")
+imputed_data<-t(imputed_data)
+rownames(imputed_data) <- as.character(h5read("../../example_data/imputation/imputed_data.h5", "matrix/features"))
+colnames(imputed_data) <- as.character(h5read("../../example_data/imputation/imputed_data.h5", "matrix/barcodes"))
+
+gt <- h5read("../../example_data/imputation/real_data.h5", "matrix/data")
+gt <- t(gt)
+rownames(gt) <- as.character(h5read("../../example_data/imputation/real_data.h5", "matrix/features"))
+colnames(gt) <- as.character(h5read("../../example_data/imputation/real_data.h5", "matrix/barcodes"))
+gt <- NormalizeData(gt, normalization.method = 'CLR')
+
+cty <- read.csv("../../example_data/imputation/cty1.csv")$x
+  
+mse_b_gt <- mean((gt - imputed_data)^2)
+
+print(paste("MSE between gt and b:", mse_b_gt))
+```
+
+## top 100 highly varaiable features' correlation
+```{r}
+library(ggcorrplot)
+var.out <- modelGeneVar(gt)
+hvgs = getTopHVGs(var.out, n = 100)
+gt_hvg <- gt[hvgs,]
+cor_gt_hvg<-cor(t(gt_hvg),t(gt_hvg), use="na.or.complete")
+impute_gt <- imputed_data[hvgs,]
+cor_impute_gt<-cor(t(impute_gt),t(impute_gt), use="na.or.complete")
+plot_cor1<-ggcorrplot(cor_gt_hvg,hc.order = TRUE, hc.method = "complete")+scale_fill_gradient2(limit=c(-max(cor_gt_hvg[cor_gt_hvg<0.99]),max(cor_gt_hvg[cor_gt_hvg<0.99])),low="blue",high="red",mid="white" )
+
+hc_cormat_order <- function(cormat, hc.method = "complete") {
+  dd <- stats::as.dist((1 - cormat) / 2)
+  hc <- stats::hclust(dd, method = hc.method)
+  hc$order
+}
+
+cor_order <- hc_cormat_order(cor_gt_hvg)
+cor_gt_hvg <- cor_gt_hvg[cor_order,cor_order]
+
+plot_cor1<-ggcorrplot(cor_gt_hvg,hc.order = FALSE, hc.method = "complete")+scale_fill_gradient2(limit=c(-max(cor_gt_hvg[cor_gt_hvg<0.99]),max(cor_gt_hvg[cor_gt_hvg<0.99])),low="blue",high="red",mid="white" )
+cor_impute_gt <- cor_impute_gt[cor_order,cor_order]
+plot_cor2<-ggcorrplot(cor_impute_gt,hc.order = FALSE)+scale_fill_gradient2(limit=c(-1,1),low="blue",high="red",mid="white" )
+plot_cor1
+plot_cor2
+cor(as.numeric(cor_gt_hvg), as.numeric(cor_impute_gt),method="pearson")
+```
+
+## top 100 Limma markers' correlation
+```{r}
+make_sce <- function(expr, label){
+  sce <- SingleCellExperiment(list(logcounts=expr))
+  sce$celltype <- as.factor(label)
+  return(sce)
+}
+
+library(ggcorrplot)
+library(parallel)
+source("doDE_for_projectMultiOmics.R")
+sce <- make_sce(gt,cty)
+#var.out <- modelGeneVar(gt)
+#hvgs = getTopHVGs(var.out, n = 100)
+#### limma ####
+limma.res <- doLimma(as.matrix(logcounts(sce)), sce$celltype)
+gene_list <- list()
+for (l in c(1:length(unique(sce$celltype)))){
+    temp_name <- names(limma.res)[[l]]
+    gene_list <- append(gene_list, list(rownames(limma.res[[temp_name]])))
+}
+
+top5_genes_list <- lapply(gene_list, function(x) head(x, 5))
+gene_union <- Reduce(union, top5_genes_list)
+hvgs <- gene_union
+
+gt_hvg <- gt[hvgs,]
+cor_gt_hvg<-cor(t(gt_hvg),t(gt_hvg), use="na.or.complete")
+impute_gt <- imputed_data[hvgs,]
+cor_impute_gt<-cor(t(impute_gt),t(impute_gt), use="na.or.complete")
+plot_cor1<-ggcorrplot(cor_gt_hvg,hc.order = TRUE, hc.method = "complete")+scale_fill_gradient2(limit=c(-max(cor_gt_hvg[cor_gt_hvg<0.99]),max(cor_gt_hvg[cor_gt_hvg<0.99])),low="blue",high="red",mid="white" )
+
+hc_cormat_order <- function(cormat, hc.method = "complete") {
+  dd <- stats::as.dist((1 - cormat) / 2)
+  hc <- stats::hclust(dd, method = hc.method)
+  hc$order
+}
+
+cor_order <- hc_cormat_order(cor_gt_hvg)
+cor_gt_hvg <- cor_gt_hvg[cor_order,cor_order]
+
+plot_cor1<-ggcorrplot(cor_gt_hvg,hc.order = FALSE, hc.method = "complete")+scale_fill_gradient2(limit=c(-max(cor_gt_hvg[cor_gt_hvg<0.99]),max(cor_gt_hvg[cor_gt_hvg<0.99])),low="blue",high="red",mid="white" )
+cor_impute_gt <- cor_impute_gt[cor_order,cor_order]
+plot_cor2<-ggcorrplot(cor_impute_gt,hc.order = FALSE)+scale_fill_gradient2(limit=c(-1,1),low="blue",high="red",mid="white" )
+
+plot_cor1
+plot_cor2
+cor(as.numeric(cor_gt_hvg), as.numeric(cor_impute_gt),method="pearson")
+```
+
+
+
