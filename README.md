@@ -69,47 +69,7 @@ Cross Integration:
 
 ## Evaluation Pipeline
 
-To perform dimension reduction, clustering, and batch correction, we utilize various metrics from the scib package. The primary function employed in 'scib_metric.py' is scib.metrics.metrics, which is used to generating evaluation results: 
 
-```
-metrics = scib.metrics.metrics(
-    adata_unintegrated,
-    adata_integrated,
-    batch_key='batch',
-    label_key= 'celltype',
-    embed='X_emb',
-    ari_=True,
-    nmi_=True,
-    silhouette_=True,
-    graph_conn_= True,
-    pcr_=True,
-    kBET_=True,
-    isolated_labels_asw_=True,
-    isolated_labels_f1_= True,
-    lisi_graph_ = True
-)
-```
-
-For the integration methods classified as diagonal, mosaic, and cross, we employ all available metrics, used for dimension reduction, batch correction, clustering, to ensure comprehensive analysis. Conversely, for vertical integration methods, which involve only a single batch, we selectively utilize six specific metrics. These metrics are primarily focused on assessing the performance of dimension reduction and clustering.
-
-```
-metrics = scib.metrics.metrics(
-    adata_unintegrated,
-    adata_integrated,
-    label_key= 'celltype',
-    embed='X_emb',
-    ari_=True,
-    nmi_=True,
-    silhouette_=True,
-    isolated_labels_asw_=True,
-    isolated_labels_f1_= True,
-    lisi_graph_ = True
-)
-```
-
-```
-python scib_metrics_diagonal.py --data_path "./example_data/embedding.h5" --cty_path "./example_data/rna_cty.csv" "./../../../dataset/benchmark_dataset/diagonal integration/dataset18/conos_peak_cty.csv"  --save_path "./../../../result/scib_metric/diagonal integration/dataset18/Conos/" --transpose 0
-```
 
 ## License
 
