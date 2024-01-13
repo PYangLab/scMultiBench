@@ -99,7 +99,9 @@ To calculate reproducibility, we provide the code in './metrics/fs/data_subset.R
 # Imputation
 
 In the imputation process, we initially employ various imputation methods to create the imputed results. Subsequently, we utilize both the imputed data and the original dataset (maybe normalised, depends on different methods) to calculate metrics such as Mean Squared Error (MSE), pFCS, and pDES. The following figure shows the pipeline of the imputation task.
-<img width=80% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/IMP.png"/>
+
+<img width=65% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/IMP.png"/>
+
 We provide the code in './metrics/imputation/imputation_metrics.Rmd' To illustrate these metrics, we have provided an example dataset in the 'example_data/imputation' directory. 
 
 In the first part of './metrics/imputation/imputation_metrics.Rmd', we focus on calculating the Mean Squared Error (MSE) between the imputed data and the ground truth data. This provides a quantitative measure of the imputation accuracy.
@@ -111,4 +113,5 @@ The third part of the script operates similarly to the second. The key distincti
 # Spatial Registration
 
 For spatial registration, the tutorial can be found in './metrics/spatial_registration/spatial_registration_metrics.ipynb'. In this tutorial, three specific metrics are highlighted: Pairwise Alignment Accuracy (PAA), Spatial Coherence Score (SCS), and Label Transfer ARI (LTARI). The following figure shows the pipeline of the spatial registration task.
-<img width=50% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/SRpng"/>
+
+<img width=50% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/SR.png"/>
