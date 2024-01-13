@@ -1,7 +1,14 @@
 ## Evaluation Pipeline
 
-# Dimension Reduction, Clustering, Batch Correction
-This page provides guidance on evaluating performance after obtaining results from specific methods. Since the metrics for dimension reduction, clustering, and batch correction follows the scib package pipeline, we will discuss them collectively. To execute the metrics for dimension reduction, clustering, and batch correction, you can follow these steps:
+# Dimension Reduction, Batch Correction, Clustering
+This page provides guidance on evaluating performance after obtaining results from specific methods. Since the metrics for dimension reduction, clustering, and batch correction follows the scib package pipeline, we will discuss them collectively.
+The followings figures show the pipelines for dimension reduction, batch correction, and clustering, respectively.
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/DR.png"/>
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/BC.png"/>
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/CLU.png"/>
+
+
+To execute the metrics for dimension reduction, clustering, and batch correction, you can follow these steps:
 ```
 cd metrics/scib_metrics
 python scib_metric.py --data_path "../../example_data/Ramasway/embedding.h5" --cty_path "../../example_data/Ramasway/cty1.csv" "../../example_data/Ramasway/cty2.csv" "../../example_data/Ramasway/cty3.csv" --save_path "../../results/scib_metrics/"
