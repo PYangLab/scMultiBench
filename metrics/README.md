@@ -14,8 +14,11 @@ cd metrics/scib_metrics
 python scib_metric.py --data_path "../../example_data/Ramasway/embedding.h5" --cty_path "../../example_data/Ramasway/cty1.csv" "../../example_data/Ramasway/cty2.csv" "../../example_data/Ramasway/cty3.csv" --save_path "../../results/scib_metrics/"
 ```
 This command includes various parameters:
+
 --data_path: Specifies the path to the file containing embedding results obtained from various integration methods. In this example, the data is located at "../example_data/Ramasway/embedding.h5".
+
 --cty_path: Indicates the paths to the real label information files from the original datasets. Multiple cty files can be provided, with each representing a different batch. In this command, three cty files (3 batches) are specified.
+
 --save_path: Determines the directory where the results of the script will be saved. In this case, the results will be saved to "../results/scib_metrics/".
 
 After running the above commands, the results is 
@@ -60,10 +63,15 @@ cd metrics/classification
 python classification.py --reference "../../example_data/classification/data1.h5" --query "../../example_data/classification/data2.h5" --reference_cty "../../example_data/classification/cty1.csv" --query_cty "../../example_data/classification/cty2.csv" --save_path "../../result/classification/"
 ``` 
 This command includes various parameters:
+
 --reference: Specifies the reference dataset for classification, sourced from a specific batch of integrated embeddings.
+
 --query: Specifies the query dataset for classification, it is another batch of the same integrated embeddings with reference.
+
 --reference_cty: Indicates the cell type information for the reference dataset.
+
 --query_cty: Indicates the cell type information for the query dataset.
+
 --save_path: Determines the location where the results, including the ground truth labels and predicted labels for the query data, will be stored.
 
 Then, the results 'predict.csv' and groundtruth 'query.csv' will be saved in the directory specified by the 'save_path'.
