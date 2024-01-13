@@ -56,7 +56,8 @@ metrics = scib.metrics.metrics(
 
 # Classification
 For the classification task, a linear classifier is employed. The following figure shows the pipeline of the classification task.
-<img width=80% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/CLA.png"/>
+<img width=75% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/CLA.png"/>
+
 To execute the classification and obtain the results, the following command should be run:
 ```
 cd metrics/classification
