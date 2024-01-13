@@ -3,8 +3,8 @@
 # Dimension Reduction, Batch Correction, Clustering
 This page provides guidance on evaluating performance after obtaining results from specific methods. Since the metrics for dimension reduction, clustering, and batch correction follows the scib package pipeline, we will discuss them collectively.
 The followings figures show the pipelines for dimension reduction, batch correction, and clustering, respectively.
-<img width=80% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/DR.png"/>
-<img width=80% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/BC.png"/>
+<img width=65% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/DR.png"/>
+<img width=65% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/BC.png"/>
 <img width=80% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/CLU.png"/>
 
 
