@@ -89,7 +89,8 @@ Upon obtaining the classification results, 4 classification metrics can be emplo
 
 # Feature Selection 
 In the feature selection process, we first obtain the importance score by running each method which applicable for feature selection. Following that, we compute the specificity and reproducibility for each respective method. Additionally, we apply clustering and classification techniques using the top features identified. The process for clustering and classification is similar to the one previously described, hence it will not be demonstrated here. Our primary focus will be on illustrating how to calculate specificity and reproducibility. The following figure shows the pipeline of the feature selection task.
-<img width=80% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/FS.png"/>
+
+<img width=60% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/FS.png"/>
 
 To calculate specificity, users can execute the './metrics/fs/specificity.Rmd' file. It's important for users to modify the file path in the script to their own path. Upon running this script, it will output the pairwise top marker intersections across different cell types. A smaller intersection indicates higher specificity, signifying the distinctiveness of the selected markers.
 
