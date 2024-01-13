@@ -69,7 +69,7 @@ Cross Integration:
 
 ## Evaluation Pipeline
 
-All evaluation pipelines can be found within the 'metrics' folder. Example datasets are stored in the 'example_data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'example_data/spatial/' folder. 
+All evaluation pipelines can be found within the ['metrics'](https://github.com/PYangLab/scMultiBench/tree/main/metrics) folder. Example datasets are stored in the 'example_data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'example_data/spatial/' folder. 
 
 
 ## License
