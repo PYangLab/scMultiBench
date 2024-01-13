@@ -52,7 +52,9 @@ metrics = scib.metrics.metrics(
 ```
 
 # Classification
-For the classification task, a linear classifier is employed. To execute the classification and obtain the results, the following command should be run:
+For the classification task, a linear classifier is employed. The following figure shows the pipeline of the classification task.
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/CLA.png"/>
+To execute the classification and obtain the results, the following command should be run:
 ```
 cd metrics/classification
 python classification.py --reference "../../example_data/classification/data1.h5" --query "../../example_data/classification/data2.h5" --reference_cty "../../example_data/classification/cty1.csv" --query_cty "../../example_data/classification/cty2.csv" --save_path "../../result/classification/"
@@ -77,7 +79,8 @@ Upon obtaining the classification results, 4 classification metrics can be emplo
 ```
 
 # Feature Selection 
-In the feature selection process, we first obtain the importance score by running each method which applicable for feature selection. Following that, we compute the specificity and reproducibility for each respective method. Additionally, we apply clustering and classification techniques using the top features identified. The process for clustering and classification is similar to the one previously described, hence it will not be demonstrated here. Our primary focus will be on illustrating how to calculate specificity and reproducibility.
+In the feature selection process, we first obtain the importance score by running each method which applicable for feature selection. Following that, we compute the specificity and reproducibility for each respective method. Additionally, we apply clustering and classification techniques using the top features identified. The process for clustering and classification is similar to the one previously described, hence it will not be demonstrated here. Our primary focus will be on illustrating how to calculate specificity and reproducibility. The following figure shows the pipeline of the feature selection task.
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/FS.png"/>
 
 To calculate specificity, users can execute the './metrics/fs/specificity.Rmd' file. It's important for users to modify the file path in the script to their own path. Upon running this script, it will output the pairwise top marker intersections across different cell types. A smaller intersection indicates higher specificity, signifying the distinctiveness of the selected markers.
 
@@ -85,7 +88,9 @@ To calculate reproducibility, we provide the code in './metrics/fs/data_subset.R
 
 # Imputation
 
-In the imputation process, we initially employ various imputation methods to create the imputed results. Subsequently, we utilize both the imputed data and the original dataset (maybe normalised, depends on different methods) to calculate metrics such as Mean Squared Error (MSE), pFCS, and pDES. We provide the code in './metrics/imputation/imputation_metrics.Rmd' To illustrate these metrics, we have provided an example dataset in the 'example_data/imputation' directory.
+In the imputation process, we initially employ various imputation methods to create the imputed results. Subsequently, we utilize both the imputed data and the original dataset (maybe normalised, depends on different methods) to calculate metrics such as Mean Squared Error (MSE), pFCS, and pDES. The following figure shows the pipeline of the imputation task.
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/IMP"/>
+We provide the code in './metrics/imputation/imputation_metrics.Rmd' To illustrate these metrics, we have provided an example dataset in the 'example_data/imputation' directory. 
 
 In the first part of './metrics/imputation/imputation_metrics.Rmd', we focus on calculating the Mean Squared Error (MSE) between the imputed data and the ground truth data. This provides a quantitative measure of the imputation accuracy.
 
@@ -95,4 +100,5 @@ The third part of the script operates similarly to the second. The key distincti
 
 # Spatial Registration
 
-For spatial registration, the tutorial can be found in './metrics/spatial_registration/spatial_registration_metrics.ipynb'. In this tutorial, three specific metrics are highlighted: Pairwise Alignment Accuracy (PAA), Spatial Coherence Score (SCS), and Label Transfer ARI (LTARI).
+For spatial registration, the tutorial can be found in './metrics/spatial_registration/spatial_registration_metrics.ipynb'. In this tutorial, three specific metrics are highlighted: Pairwise Alignment Accuracy (PAA), Spatial Coherence Score (SCS), and Label Transfer ARI (LTARI). The following figure shows the pipeline of the spatial registration task.
+<img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/SR"/>
