@@ -7,7 +7,7 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 
 ## Integration Tools
 
-In this benchmark, we evaluated 34 integration methods across the four data integration categories on 53 datasets. In particular, we include 17 vertical integration methods, 11 diagonal integration tools, 7 mosaic integration tools, and 14 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
+In this benchmark, we evaluated 34 integration methods across the four data integration categories on 53 datasets on a Ubuntu system with 1 RTX3090 GPU. In particular, we include 17 vertical integration methods, 11 diagonal integration tools, 7 mosaic integration tools, and 14 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
 
 Vertical Integration:
 - [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
