@@ -66,6 +66,7 @@ Cross Integration:
 - [eggplant](https://github.com/almaan/eggplant) v0.2.3
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
 
+Note that the installation time for tools can vary depending on the method used. For more detailed information, refer to the original publication.
 
 ## Evaluation Pipeline
 
