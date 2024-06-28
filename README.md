@@ -14,7 +14,7 @@ Vertical Integration:
 - [SnapCCESS](https://github.com/PYangLab/SnapCCESS) v0.2.1
 - [Concerto](https://github.com/melobio/Concerto-reproducibility) Github Version: ab1fc7f
 - [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
-- [Seurat_WNN](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis) v4.1.1.9001 
+- [Seurat_WNN](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis) v5.0.2
 - [scMSI](https://github.com/ChengmingZhang-CAS/scMSI-master) Github Version: dffcbb2
 - [moETM](https://github.com/manqizhou/moETM) Github Version: ad89fe2
 - [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
@@ -38,14 +38,14 @@ Diagonal Integration:
 - [iNMF](https://github.com/welch-lab/liger) v2.0.1
 - [online iNMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [GLUE](https://github.com/tanlabcode/GLUER) Github Version: 192bb6e
-- [Seurat v3](https://satijalab.org/seurat/articles/seurat5_atacseq_integration_vignette) v4.1.1.9001 
+- [Seurat v3](https://satijalab.org/seurat/articles/seurat5_atacseq_integration_vignette) v5.0.2
 - [MultiMAP](https://github.com/Teichlab/MultiMAP) v0.0.1
 
 Mosaic Integration:
 - [MultiVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html) v1.1.2
 - [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8
 - [Cobolt](https://github.com/epurdom/cobolt) v1.0.1
-- [Seurat v5](https://satijalab.org/seurat/articles/seurat5_integration_bridge) v4.1.1.9001 
+- [Seurat v5](https://satijalab.org/seurat/articles/seurat5_integration_bridge) v5.0.2
 - [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
 - [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
