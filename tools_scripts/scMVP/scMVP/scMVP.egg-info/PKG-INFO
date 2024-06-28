@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: scMVP
+Version: 0.0.1
+Summary: Single Cell Multi-View Profiler
+Home-page: https://github.com/bm2-lab/scMVP
+Author: Gao yang Li, 
+Author-email: lgyzngc@tongji.edu.cn
+License: MIT license
+Keywords: scMVP
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Topic :: Scientific/Engineering :: bioinformatics
+Provides-Extra: notebooks
+Provides-Extra: docs
+Provides-Extra: test
+License-File: LICENSE
+
+UNKNOWN
+
