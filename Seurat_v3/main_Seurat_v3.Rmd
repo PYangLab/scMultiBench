@@ -1,0 +1,122 @@
+library(rhdf5)
+library(Seurat)
+library(Signac)
+library(ggplot2)
+library(cowplot)
+library(HDF5Array)
+library(EnsDb.Hsapiens.v86)
+
+h5_to_matrix <- function(path){
+    h5_data <- h5read(path,"matrix") 
+    feature <- h5_data$features
+    barcode <- h5_data$barcodes
+    data <- t(h5_data$data)
+    colnames(data) <- as.character(barcode)
+    rownames(data) <- as.character(feature)
+    return (data)
+}
+
+write_h5 <- function(exprs_list, h5file_list) {
+  if (length(unique(lapply(exprs_list, rownames))) != 1) {
+    stop("rownames of exprs_list are not identical.")
+  }
+  for (i in seq_along(exprs_list)) {
+    if (file.exists(h5file_list[i])) {
+      warning("h5file exists! will rewrite it.")
+      system(paste("rm", h5file_list[i]))
+    }
+    h5createFile(h5file_list[i])
+    writeHDF5Array(((exprs_list[[i]])), h5file_list[i], name = "data")
+    print(h5ls(h5file_list[i]))
+  }
+}
+
+# wrap function for seurat v3
+runSeurat<- function(rna_path, atac_path, gene.activities_path, rna_cty_path){
+  rna <- h5_to_matrix(rna_path)
+  atac <- h5_to_matrix(atac_path)
+  gene.activities <- h5_to_matrix(gene.activities_path)
+  rna_seurat <- CreateSeuratObject(counts = rna)
+  rna_cty <- read.csv(rna_cty_path)$x
+  rna_seurat$annotation <- rna_cty
+  atac_seurat <-CreateChromatinAssay(counts = atac, sep = c(":", "-")) 
+  atac_seurat  <- CreateSeuratObject(counts = atac_seurat, assay = 'ATAC') 
+
+  rna_seurat <- NormalizeData(rna_seurat)
+  rna_seurat <- FindVariableFeatures(rna_seurat)
+  rna_seurat <- ScaleData(rna_seurat)
+  rna_seurat <- RunPCA(rna_seurat)
+  rna_seurat <- RunUMAP(rna_seurat, dims = 1:30)
+  
+  annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
+  seqlevelsStyle(annotations) <- "UCSC"
+  genome(annotations) <- "hg38"
+  Annotation(atac_seurat) <- annotations
+
+  atac_seurat <- RunTFIDF(atac_seurat)
+  atac_seurat <- FindTopFeatures(atac_seurat, min.cutoff = "q0")
+  atac_seurat <- RunSVD(atac_seurat)
+  atac_seurat <- RunUMAP(atac_seurat, reduction = "lsi", dims = 2:30, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
+  
+  # we directly read the gene activities obtained from CreateGeneActivityMatrix function in the old Seurat version as this function doesn't need fragment information
+  atac_seurat[["ACTIVITY"]] <- CreateAssayObject(counts = gene.activities)
+  # normalize gene activities
+  DefaultAssay(atac_seurat) <- "ACTIVITY"
+  atac_seurat <- NormalizeData(atac_seurat)
+  atac_seurat <- ScaleData(atac_seurat, features = rownames(atac_seurat))
+
+  # Identify anchors
+  transfer.anchors <- FindTransferAnchors(reference = rna_seurat, query = atac_seurat, features =
+                                            VariableFeatures(object = rna_seurat),
+                                          reference.assay = "RNA", query.assay = "ACTIVITY", reduction = "cca") 
+
+  # prediction
+  celltype.predictions <- TransferData(anchorset = transfer.anchors, refdata = rna_seurat$annotation,
+    weight.reduction = atac_seurat[["lsi"]], dims = 2:30)
+  atac_seurat <- AddMetaData(atac_seurat, metadata = celltype.predictions)
+
+  # coembedding
+  genes.use <- VariableFeatures(rna_seurat)
+  refdata <- GetAssayData(rna_seurat, assay = "RNA", slot = "data")[genes.use, ]
+  imputation <- TransferData(anchorset = transfer.anchors, refdata = refdata, weight.reduction = atac_seurat[["lsi"]],
+      dims = 2:30) 
+  atac_seurat[["RNA"]] <- imputation
+  
+  coembed <- merge(x = rna_seurat, y = atac_seurat)
+  coembed <- ScaleData(coembed, features = genes.use, do.scale = FALSE)
+  coembed <- RunPCA(coembed, features = genes.use, verbose = FALSE)
+  result <- coembed@reductions[["pca"]]@cell.embeddings
+  result_rna <- result[1:dim(rna)[2],]
+  result_rna <- t(result_rna)
+  result_atac <- result[(dim(rna)[2]+1):dim(result)[1],]
+  result_atac <- t(result_atac)
+  return (list(result_rna, result_atac, atac_seurat$predicted.id))
+}
+
+# load data, the input is RNA counts and ATAC gene activity score counts
+begin_time <- Sys.time()
+args <- commandArgs(trailingOnly = TRUE)
+rna_path <- args[1] 
+atac_path <- args[2] 
+gene_activity_path <- args[3] 
+rna_cty_path <- args[4] 
+save_path <- args[5] 
+rna_path <- unlist(strsplit(rna_path, ",")) 
+atac_path <- unlist(strsplit(atac_path, ","))
+gene.activities_path <- unlist(strsplit(atac_path, ","))
+rna_cty_path <- unlist(strsplit(rna_cty_path, ","))
+result <- runSeurat(rna_path, atac_path)
+end_time <- Sys.time()
+all_time <- end_time - begin_time
+
+# save result
+if (!dir.exists(save_path)) {
+  dir.create(save_path, recursive = TRUE)
+  print("path create")
+}
+embedding <- cbind(result[[1]], result[[2]])
+write_h5(exprs_list = list(embedding = embedding), 
+             h5file_list = c(paste(save_path,"embedding.h5")))
+write_h5(exprs_list = list(predict.cty = result[[3]]), 
+             h5file_list = c(paste(save_path,"predict_cty.h5")))
+
