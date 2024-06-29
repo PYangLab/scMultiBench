@@ -52,7 +52,12 @@ Mosaic Integration:
 - [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
 - [SMILE](https://github.com/rpmccordlab/SMILE) Github Version: a2e2ca6
-
+- [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
+- [sciPENN](https://github.com/jlakkis/sciPENN) v1.0.0
+- [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
+- [moETM](https://github.com/manqizhou/moETM) Github Version: ad89fe2
+- [UnitedNet](https://github.com/LiuLab-Bioelectronics-Harvard/UnitedNet) Github Version: 3689da8
+    
 Cross Integration:
 - [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
 - [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
