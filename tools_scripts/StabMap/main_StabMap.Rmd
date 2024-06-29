@@ -1,0 +1,43 @@
+library(StabMap)
+library(rhdf5)
+library(SingleCellExperiment)
+library(scran)
+library(Seurat)
+library(HDF5Array)
+source("util.R")
+set.seed(2021)
+
+run_StabMap <- function(file_paths,save_path){
+    begin_time <- Sys.time()
+    processed_data <- read_h5_data(file_paths$rna_path,file_paths$adt_path,file_paths$atac_path,(length(file_paths[[1]])))
+    stabmap_input <- stabmap_input_function(file_paths, processed_data)
+    result = stabMap(stabmap_input,
+                   reference_list = c("data1"),
+                   maxFeatures = Inf,
+                   plot = FALSE)
+    
+    ######### data imputation after stabmap ###########
+    imp = imputeEmbedding(
+        stabmap_input, # original data list
+        result, # joint embedding
+        reference = colnames(stabmap_input[["data2"]]),
+        query = colnames(stabmap_input[["data1"]]))
+
+    end_time <- Sys.time()
+    all_time <- difftime(end_time, begin_time, units="secs")
+
+    if (!dir.exists(save_path)) {
+      dir.create(save_path, recursive = TRUE)
+      print("path create")
+     }
+    write_h5(exprs_list = list(rna = result), 
+                 h5file_list = c(paste0(save_path,"embedding.h5")))
+    #write_h5(exprs_list = list(rna = imp$data2[a,]), 
+    #             h5file_list = c(paste0(save_path,"imputated_adt_data1.h5")))
+    #write.csv(all_time, paste0(save_path,"time.csv"))
+}
+
+
+
+
+
