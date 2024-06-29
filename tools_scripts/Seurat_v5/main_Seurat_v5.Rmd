@@ -1,0 +1,105 @@
+library(Seurat)
+library(dplyr)
+library(ggplot2)
+library(HDF5Array)
+library(Signac)
+library(glue)
+
+h5_to_matrix <- function(path){
+    h5_data <- h5read(path, "matrix") 
+    feature <- h5_data$features
+    barcode <- h5_data$barcodes
+    data <- t(h5_data$data)
+    colnames(data) <- as.character(barcode)
+    rownames(data) <- as.character(feature)
+    return (data)
+}
+
+write_h5 <- function(exprs_list, h5file_list) {
+  if (length(unique(lapply(exprs_list, rownames))) != 1) {
+    stop("rownames of exprs_list are not identical.")
+  }
+  for (i in seq_along(exprs_list)[1:(length(seq_along(exprs_list))-1)]) {
+    if (file.exists(h5file_list[i])) {
+      warning("h5file exists! will rewrite it.")
+      system(paste0("rm", h5file_list[i]))
+    }
+    h5createFile(h5file_list[i])
+    writeHDF5Array(((exprs_list[[i]])), h5file_list[i], name = "data")
+    print(h5ls(h5file_list[i]))
+  }
+}
+
+run_Seurat_atac_peak <- function(path_rna1,path_rna2,path_atac2,path_atac3,save_path){
+  rna_count <- h5_to_matrix(path_rna2)
+  atac_count <- h5_to_matrix(path_atac2)
+  obj.multi  <- CreateSeuratObject(counts = rna_count)
+  obj.atac  <- CreateChromatinAssay(counts = atac_count, sep = c(":", "-"))
+  obj.multi[["ATAC"]] <- obj.atac
+
+  rna_count <- h5_to_matrix(path_rna1)
+  obj.rna  <- CreateSeuratObject(counts = rna_count,assay = 'RNA')
+  obj.rna = SCTransform(object = obj.rna) %>%  RunPCA() %>%
+    RunUMAP(dims = 1:50, return.model = TRUE)
+
+  atac_count <- h5_to_matrix(path_atac3)
+  ATAC_assay <- CreateChromatinAssay(counts = atac_count, sep = c(":", "-"))
+  obj.atac  <- CreateSeuratObject(counts = ATAC_assay,assay = 'ATAC') 
+
+# normalize multiome RNA
+  DefaultAssay(obj.multi) <- "RNA"
+  obj.multi <- SCTransform(obj.multi, verbose = FALSE)
+# normalize multiome ATAC
+  DefaultAssay(obj.multi) <- "ATAC"
+  obj.multi <- RunTFIDF(object = obj.multi) 
+  obj.multi <- FindTopFeatures(obj.multi, min.cutoff = "q0")
+# normalize query
+  obj.atac <- RunTFIDF(object = obj.atac)  
+
+  dims.atac <- 2:50
+  dims.rna <- 1:50
+  DefaultAssay(obj.multi) <-  "RNA"
+  DefaultAssay(obj.rna) <- "SCT"
+
+  obj.rna.ext <- PrepareBridgeReference(
+    reference = obj.rna, bridge = obj.multi,
+    reference.reduction = "pca", reference.dims = dims.rna,
+    normalization.method = "SCT")
+  
+  bridge.anchor <- FindBridgeTransferAnchors(
+    extended.reference = obj.rna.ext, query = obj.atac,
+    reduction = "lsiproject", dims = dims.atac)
+  
+  obj.atac <- MapQuery(
+    anchorset = bridge.anchor, reference = obj.rna.ext,
+    query = obj.atac,
+    reduction.model = "umap")
+
+  a1 <- obj.atac@reductions$ref.umap@cell.embeddings
+  a2 <- obj.rna@reductions$umap@cell.embeddings
+  result <- list(a1,a2)
+  return(result)
+}
+
+args <- commandArgs(trailingOnly = TRUE)
+rna_path1 <- args[1] 
+rna_path2 <- args[2]
+adt_path2 <- args[3]
+adt_path3 <- args[4]
+save_path <- args[5] 
+
+begin_time <- Sys.time()
+result <- run_Seurat_atac_peak(rna_path1,rna_path2,adt_path2,adt_path3,save_path)
+end_time <- Sys.time()
+all_time <- difftime(end_time, begin_time, units="secs")
+  
+if (!dir.exists(save_path)) {
+  dir.create(save_path, recursive = TRUE)
+  print("path create")
+}
+print(dim(result[[1]]))
+print(all_time)
+write_h5(exprs_list = list(rna = result[[1]]), h5file_list = c(paste0(save_path,"embedding1.h5")))
+write_h5(exprs_list = list(rna = result[[2]]), h5file_list = c(paste0(save_path,"embedding2.h5")))
+write.csv(all_time, paste0(save_path,"time.csv"))
+

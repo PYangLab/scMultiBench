@@ -1,0 +1,80 @@
+```{r}
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(dplyr)
+  library(rhdf5)
+  library(HDF5Array)
+})
+
+source("util.R")
+
+# load parameters from
+args <- commandArgs(trailingOnly = TRUE)
+rna_path <- args[1] 
+adt_path <- args[2] 
+atac_path <- args[3] 
+save_path <- args[4] 
+
+rna_path <- "../../../dataset/benchmark_dataset/vertical integration/dataset3/rna.h5"
+adt_path <- "../../../dataset/benchmark_dataset/vertical integration/dataset3/adt.h5"
+begin_time <- Sys.time()
+rna <- "NULL"
+adt <- "NULL"
+atac <- "NULL"
+if (rna_path!="NULL"){rna <- h5_to_matrix(rna_path)} else{rna <- "NULL"}
+if (adt_path!="NULL"){adt <- h5_to_matrix(adt_path)} else{adt <- "NULL"}
+if (atac_path!="NULL"){atac <- h5_to_matrix(atac_path)} else{atac <- "NULL"}
+if ((rna_path!="NULL") & (adt_path!="NULL")){result <- run_Seurat_RNA_ADT(rna,adt)}
+if ((rna_path!="NULL") & (atac_path!="NULL")){result <- run_Seurat_RNA_ATAC(rna,atac)}
+if ((adt_path!="NULL") & (atac_path!="NULL")){result <- run_Seurat_ADT_ATAC(adt,atac)}
+if ((rna_path!="NULL") & (adt_path!="NULL") & (atac_path!="NULL")){result <- run_Seurat_RNA_ADT_ATAC(rna,adt,atac)}
+
+
+
+run_Seurat_RNA_ADT <- function(rna, adt){
+  bm <- CreateSeuratObject(counts = rna)
+  adt_assay <- CreateAssayObject(counts = adt)
+  bm[["ADT"]] <- adt_assay
+  
+  DefaultAssay(bm) <- 'RNA'
+  bm <- NormalizeData(bm) %>% FindVariableFeatures() %>% ScaleData() %>% RunPCA()
+
+  DefaultAssay(bm) <- 'ADT'
+  # we will use all ADT features for dimensional reduction
+  # we set a dimensional reduction name to avoid overwriting the 
+  VariableFeatures(bm) <- rownames(bm[["ADT"]])
+  bm <- NormalizeData(bm, normalization.method = 'CLR', margin = 2) %>% 
+    ScaleData() %>% RunPCA(reduction.name = 'apca')
+  
+  # Identify multimodal neighbors. These will be stored in the neighbors slot, 
+  # and can be accessed using bm[['weighted.nn']]
+  # The WNN graph can be accessed at bm[["wknn"]], 
+  # and the SNN graph used for clustering at bm[["wsnn"]]
+  # Cell-specific modality weights can be accessed at bm$RNA.weight
+  bm <- FindMultiModalNeighbors(
+    bm, reduction.list = list("pca", "apca"), 
+    dims.list = list(1:30, 1:18), modality.weight.name = "RNA.weight"
+  )
+
+  #bm <- RunUMAP(bm, nn.name = "weighted.nn", reduction.name = "wnn.umap", reduction.key = "wnnUMAP_", return.model = TRUE)
+  bm <- FindClusters(bm, graph.name = "wsnn", algorithm = 3, resolution = 2, verbose = FALSE)
+  
+  return(bm) # the dimension of embedding is 2
+}
+
+
+
+
+embedding <- result[['weighted.nn']]@nn.dist
+embedding = t(embedding)
+end_time <- Sys.time()
+all_time <- difftime(end_time, begin_time, units="secs")
+
+if (!dir.exists(save_path)) {
+  dir.create(save_path, recursive = TRUE)
+  print("path create")
+}
+write_h5(exprs_list = list(rna = embedding), 
+             h5file_list = c(paste0(save_path,"embedding.h5")))
+write.csv(all_time, paste0(save_path,"time.csv"))
+```
