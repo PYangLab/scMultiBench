@@ -11,7 +11,6 @@ In this benchmark, we evaluated 34 integration methods across the four data inte
 
 Vertical Integration:
 - [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
-- [SnapCCESS](https://github.com/PYangLab/SnapCCESS) v0.2.1
 - [Concerto](https://github.com/melobio/Concerto-reproducibility) Github Version: ab1fc7f
 - [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
 - [Seurat_WNN](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis) v5.0.2
