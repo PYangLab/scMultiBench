@@ -31,7 +31,7 @@ def data_loader(path, top_number):
     
 def run_iPOLNG(data1_path, data2_path):
     data1 = data_loader(data1_path, 5000)
-    data2 = data_loader(data2_path, 200000)
+    data2 = data_loader(data2_path, 20000)
     print(data1.shape)
     print(data2.shape)
     W = {"W1":data1.type("torch.cuda.FloatTensor"), "W2":data2.type("torch.cuda.FloatTensor")}
