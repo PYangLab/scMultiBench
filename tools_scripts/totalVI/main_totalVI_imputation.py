@@ -128,7 +128,7 @@ sc.pp.highly_variable_genes(
 scvi.model.TOTALVI.setup_anndata(
     adata, batch_key="batch", protein_expression_obsm_key="protein_expression"
 )
-model = scvi.model.TOTALVI(adata, latent_distribution="normal", n_layers_decoder=2)
+model = scvi.model.TOTALVI(adata, empirical_protein_background_prior=False, latent_distribution="normal", n_layers_decoder=2)
 model.train()
 
 embedding = model.get_latent_representation()
