@@ -39,17 +39,17 @@ def process_atac(adata_atac,barcodes,featurs):
     adata_atac.layers['counts'] = adata_atac.X
     adata_atac.obs.index = barcodes
     adata_atac.var_names = featurs
-    sc.pp.normalize_total(adata_atac, target_sum=20000)
+    sc.pp.normalize_total(adata_atac, target_sum=1e4)
     sc.pp.log1p(adata_atac)
     adata_atac.layers['log-norm'] = adata_atac.X.copy()
     return adata_atac
 
-def process_adt(adata_adt,barcodes,featurs):
-    adata_adt.layers['counts'] = adata_adt.X
-    adata_adt.obs.index = barcodes
-    adata_adt.var_names = featurs
-    muon.prot.pp.clr(adata_adt)
-    return adata_adt
+def process_atac(adata_atac,barcodes,featurs):
+    adata_atac.layers['counts'] = adata_atac.X
+    adata_atac.obs.index = barcodes
+    adata_atac.var_names = featurs
+    muon.prot.pp.clr(adata_atac)
+    return adata_atac
     
 
 def h5_to_matrix(path):
@@ -62,47 +62,47 @@ def h5_to_matrix(path):
     
 rna_path1 = args.path1
 rna_path2 = args.path2
-adt_path2 = args.path3
-adt_path3 = args.path4
+atac_path2 = args.path3
+atac_path3 = args.path4
 
 rna1, barcodes1, rna_features = h5_to_matrix(rna_path1)
 rna2, barcodes2, rna_features = h5_to_matrix(rna_path2)
-adt2, barcodes2, adt_features = h5_to_matrix(adt_path2)
-adt3, barcodes3, adt_features = h5_to_matrix(adt_path3)
+atac2, barcodes2, atac_features = h5_to_matrix(atac_path2)
+atac3, barcodes3, atac_features = h5_to_matrix(atac_path3)
 
 
 adata_rna1 = process_rna(ad.AnnData(rna1),barcodes1, rna_features)
 adata_rna2 = process_rna(ad.AnnData(rna2),barcodes2, rna_features)
-adata_adt2 = process_atac(ad.AnnData(adt2), barcodes2, adt_features)
-adata_adt3 = process_atac(ad.AnnData(adt3), barcodes3, adt_features)
+adata_atac2 = process_atac(ad.AnnData(atac2), barcodes2, atac_features)
+adata_atac3 = process_atac(ad.AnnData(atac3), barcodes3, atac_features)
 
 adata_rna1.obs['Modality'] = "rna"
 adata_rna2.obs['Modality'] = "cite"
-adata_adt2.obs['Modality'] = "cite"
-adata_adt3.obs['Modality'] = "adt"
+adata_atac2.obs['Modality'] = "cite"
+adata_atac3.obs['Modality'] = "atac"
 
 adata_rna = ad.concat([adata_rna1, adata_rna2], merge='same')
 sc.pp.highly_variable_genes(adata_rna, n_top_genes=4000,  batch_key='Modality')
 adata_rna1 = adata_rna1[:, adata_rna.var.highly_variable]
 adata_rna2 = adata_rna2[:, adata_rna.var.highly_variable]
 
-adata_adt = ad.concat([adata_adt2, adata_adt3], merge='same')
-sc.pp.highly_variable_genes(adata_adt, n_top_genes=2000,  batch_key='Modality')
-adata_adt2 = adata_adt2[:, adata_adt.var.highly_variable]
-adata_adt3 = adata_adt3[:, adata_adt.var.highly_variable]
+adata_atac = ad.concat([adata_atac2, adata_atac3], merge='same')
+sc.pp.highly_variable_genes(adata_atac, n_top_genes=20000,  batch_key='Modality')
+adata_atac2 = adata_atac2[:, adata_atac.var.highly_variable]
+adata_atac3 = adata_atac3[:, adata_atac.var.highly_variable]
 
-print(adata_rna2.obs.index == adata_adt2.obs.index)
+print(adata_rna2.obs.index == adata_atac2.obs.index)
 indices = range(1, len(adata_rna1.obs_names) + 1)
 adata_rna1.obs.index= [f"{index}rna-{original}" for index, original in zip(indices, adata_rna1.obs_names)]
 indices = range(1, len(adata_rna2.obs_names) + 1)
 adata_rna2.obs.index= [f"{index}cite-{original}" for index, original in zip(indices, adata_rna2.obs_names)]
-indices = range(1, len(adata_adt2.obs_names) + 1)
-adata_adt2.obs.index= [f"{index}cite-{original}" for index, original in zip(indices, adata_adt2.obs_names)]
-indices = range(1, len(adata_adt3.obs_names) + 1)
-adata_adt3.obs.index= [f"{index}adt-{original}" for index, original in zip(indices, adata_adt3.obs_names)]
+indices = range(1, len(adata_atac2.obs_names) + 1)
+adata_atac2.obs.index= [f"{index}cite-{original}" for index, original in zip(indices, adata_atac2.obs_names)]
+indices = range(1, len(adata_atac3.obs_names) + 1)
+adata_atac3.obs.index= [f"{index}atac-{original}" for index, original in zip(indices, adata_atac3.obs_names)]
 
 adata = mtg.data.organize_multiome_anndatas(
-    adatas = [[adata_rna1, adata_rna2, None], [None, adata_adt2, adata_adt3]],
+    adatas = [[adata_rna1, adata_rna2, None], [None, adata_atac2, adata_atac3]],
     layers = [['counts', 'counts', None], [None, 'log-norm', 'log-norm']],
 )
 adata
