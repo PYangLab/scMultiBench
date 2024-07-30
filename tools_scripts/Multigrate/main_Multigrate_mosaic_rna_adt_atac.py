@@ -39,7 +39,7 @@ def process_atac(adata_atac,barcodes,featurs):
     adata_atac.layers['counts'] = adata_atac.X
     adata_atac.obs.index = barcodes
     adata_atac.var_names = featurs
-    sc.pp.normalize_total(adata_atac, target_sum=20000)
+    sc.pp.normalize_total(adata_atac, target_sum=1e4)
     sc.pp.log1p(adata_atac)
     adata_atac.layers['log-norm'] = adata_atac.X.copy()
     return adata_atac
@@ -101,7 +101,7 @@ adata_rna1 = adata_rna1[:, adata_rna.var.highly_variable]
 adata_rna2 = adata_rna2[:, adata_rna.var.highly_variable]
 adata_rna3 = adata_rna3[:, adata_rna.var.highly_variable]
 
-sc.pp.highly_variable_genes(adata_atac2, n_top_genes=2000,  batch_key='Modality')
+sc.pp.highly_variable_genes(adata_atac2, n_top_genes=20000,  batch_key='Modality')
 adata_atac2 = adata_atac2[:, adata_atac2.var.highly_variable]
 
 adata_rna1.obs.index = "cite-" +adata_rna1.obs.index
