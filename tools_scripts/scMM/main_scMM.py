@@ -59,8 +59,8 @@ parser.add_argument('--no_cuda', action='store_true', default=False,
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--dataset_path', type=str, default="")
-parser.add_argument('--rna_paths', type=str, nargs='+', default=["./../../../../../../../project_mc3/chunlei/data/h5_data/CITEseq_PBMC/step1_train_rna.h5"])
-parser.add_argument('--modal_paths', type=str, nargs='+', default=["./../../../../../../../project_mc3/chunlei/data/h5_data/CITEseq_PBMC/step1_train_adt.h5"])
+parser.add_argument('--path1', type=str, nargs='+', default=["./../../../../../../../project_mc3/chunlei/data/h5_data/CITEseq_PBMC/step1_train_rna.h5"])
+parser.add_argument('--path2', type=str, nargs='+', default=["./../../../../../../../project_mc3/chunlei/data/h5_data/CITEseq_PBMC/step1_train_adt.h5"])
 parser.add_argument('--save_path', type=str, default="")
 parser.add_argument('--r_dim', type=int, default=1)
 parser.add_argument('--p_dim', type=int, default=1)
@@ -103,8 +103,8 @@ modal_path = dataset_path + '/{}'.format(modal)
 ####################################################################################
 ####################################################################################
 
-rna_paths =  args.rna_paths #
-modal_paths = args.modal_paths  #
+rna_paths =  args.path1 #
+modal_paths = args.path2  #
 
 rna_path_list = []
 num=0
