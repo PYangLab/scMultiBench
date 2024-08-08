@@ -21,9 +21,6 @@ begin_time = time.time()
 scvi.settings.seed = 0
 print("Last run with scvi-tools version:", scvi.__version__)
 
-sns.set_theme()
-torch.set_float32_matmul_precision("high")
-
 def data_loader(path):
     with h5py.File(path, "r") as f:
         X = np.array(f['matrix/data']).transpose()
