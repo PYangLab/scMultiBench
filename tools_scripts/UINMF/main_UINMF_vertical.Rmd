@@ -1,0 +1,57 @@
+# for vertical integration, need to use the old versions
+# devtools::install_github("welch-lab/liger", ref = "v1.0.1")
+library(rhdf5)
+library(scran)
+library(Seurat)
+library(rliger)
+library(HDF5Array)
+source("util.R")
+
+run_UINMF <- function(file_paths,save_path){
+  begin_time <- Sys.time()
+
+  processed_data <- read_h5_data(file_paths$rna_path,file_paths$adt_path,file_paths$atac_path,length(file_paths[[1]]))
+  UINMF_input <- UINMF_input_function(file_paths, processed_data)
+  
+  osm.UINMF <- createLiger(UINMF_input) 
+  osm.UINMF <- rliger::normalize(osm.UINMF)
+  
+  dataset_list <- list()
+  for (i in 1:(length(file_paths[[1]]))) { dataset_list[[i]] <- i }
+  
+  #osm.UINMF <- selectGenes(osm.UINMF, useUnsharedDatasets=1, unsharedThresh = 0.4)
+  #osm.UINMF <- scaleNotCenter(osm.UINMF)
+  #osm.UINMF <- runIntegration(osm.UINMF, k = 30, method = "UINMF")
+  osm.UINMF <- selectGenes(osm.UINMF, unshared = TRUE, unshared.datasets = dataset_list, unshared.thresh= 0.4) #standard is 0.4
+  osm.UINMF <- scaleNotCenter(osm.UINMF)
+  osm.UINMF <- optimizeALS(osm.UINMF, k=30, use.unshared = TRUE)
+  
+  result <- osm.UINMF@H$data1#.norm
+  end_time <- Sys.time()
+  all_time <- difftime(end_time, begin_time, units="secs")
+  
+  if (!dir.exists(save_path)) {
+    dir.create(save_path, recursive = TRUE)
+    print("path create")
+  }
+  write_h5(exprs_list = list(rna = result), h5file_list = c(paste0(save_path,"embedding.h5")))
+  write.csv(all_time, paste(save_path,"time.csv"))
+}
+
+# read parameters, the input is RNA counts and ATAC gene activity score counts
+begin_time <- Sys.time()
+args <- commandArgs(trailingOnly = TRUE)
+rna_path <- args[1] 
+adt_path <- args[2] 
+atac_path <- args[3] 
+save_path <- args[4] 
+
+if ((rna_path != "NULL")&(adt_path != "NULL")&(atac_path == "NULL")){
+  file_paths <- list(rna_path = list(args[1]),adt_path = list(args[2]))}
+if ((rna_path != "NULL")&(adt_path == "NULL")&(atac_path != "NULL")){
+  file_paths <- list(rna_path = list(args[1]),atac_path = list(args[3]))}
+if ((rna_path != "NULL")&(adt_path != "NULL")&(atac_path != "NULL")){
+  file_paths <- list(rna_path = list(args[1]),adt_path = list(args[2]),atac_path = list(args[3]))}
+    
+run_UINMF(file_paths,save_path)
+
