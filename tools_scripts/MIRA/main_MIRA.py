@@ -88,6 +88,7 @@ def run_mira(file_paths, args):
         rna_data = data_loader(rna_path[0])
     
 #    lgr.info("-----> Preprocessing RNA data ")
+        
     sc.pp.filter_genes(rna_data, min_cells=15)
     rawdata = rna_data.X.copy()
     sc.pp.normalize_total(rna_data, target_sum=1e4)
@@ -134,16 +135,33 @@ def run_mira(file_paths, args):
     #--> train RNA topic model if required, otherwise load the model based on the provided path
     if not args.load_model:
         #lgr.info("-----> Initializing ATAC topic model ")
+        print(cat_key)
+        print(args)
         atac_topic_model_pth = train_topic_model(data=atac_data, categorical_cov=cat_key, mod='accessibility', args=args)
         
     else:    
         assert args.atac_topic_modal_path is not None
         atac_topic_model_pth =  args.atac_topic_modal_path
+
+    atac_topic_model = mira.topic_model.load_model(atac_topic_model_pth)
+    atac_topic_model.predict(atac_data)
+    rna_topic_model.predict(rna_data)
+    
+    rna_topic_model.get_umap_features(rna_data, box_cox=0.25)
+    atac_topic_model.get_umap_features(atac_data, box_cox=0.25)
+    
+    print(rna_data.shape, "rna_data.shape")
+    print(atac_data.shape, "atac_data.shape")
     
     rna_data, atac_data = mira.utils.make_joint_representation(rna_data, atac_data)
-    embedding = rna_data.obsm['X_joint_umap_features']
-    print(embedding.shape)
-    return embedding
+    sc.pp.neighbors(rna_data, use_rep = 'X_joint_umap_features', metric = 'manhattan',
+               n_neighbors = 20)
+    print(rna_data)
+               
+    distances = rna_data.obsp['distances']
+    connectivities = rna_data.obsp['connectivities']
+    print(distances.shape, connectivities.shape)
+    return distances, connectivities
 
 
 file_paths = {
@@ -157,10 +175,14 @@ if not os.path.exists(args.save_path):
     print("create path for saving")
 else:
     print("the saving path exits")
-embedding=run_mira(file_paths, args)
+distances, connectivities=run_mira(file_paths, args)
 end_time = time.time()
 all_time = end_time - begin_time
 
-file = h5py.File(args.save_path+"/embedding.h5", 'w')
-file.create_dataset('data', data=embedding)
+file = h5py.File(args.save_path+"/distancess.h5", 'w')
+file.create_dataset('data', data=distances.toarray())
+file.close()
+
+file = h5py.File(args.save_path+"/connectivities.h5", 'w')
+file.create_dataset('data', data=connectivities.toarray())
 file.close()
