@@ -20,7 +20,7 @@ args = parser.parse_args()
 # run command for Concerto
 # vertical integration:
 # python main_Concerto.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/D3/"
-# cross integration
+# cross integration:
 # python main_Concerto.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/Concerto"
 
 begin_time = time.time()
