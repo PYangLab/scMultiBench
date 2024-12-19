@@ -1,13 +1,13 @@
-import mira
-import os, sys
-import anndata
-import scanpy as sc
-import numpy as np
 import h5py
-from scipy.sparse import csr_matrix
-import argparse
 import time
+import mira
+import anndata
+import os, sys
+import argparse
+import numpy as np
+import scanpy as sc
 from logger import *
+from scipy.sparse import csr_matrix
 
 parser = argparse.ArgumentParser("MIRA")
 parser.add_argument('--rna', metavar='rna_batch', nargs='+', default=[], help='path to rna train data')
@@ -21,9 +21,11 @@ parser.add_argument('--rna_topic_modal_path', default='NULL', help='path to load
 parser.add_argument('--atac_topic_modal_path', default='NULL', help='path to load the ATAC topic model')
 parser.add_argument('--acc', type=str, default='gpu', choices=["cpu", "gpu", "tpu", "ipu", "hpu","mps","auto"], help="accelerator for training, default cpu")
 parser.add_argument('--save_name', type=str, default='mira', help='filename for saving the outputs (without extension)')
-
-
 args = parser.parse_args()
+
+# The MIRA script for vertical integration requires RNA and ATAC data as input. The output is a joint graph (dimensionality reduction).
+# run commond for MIRA
+# python main_MIRA.py --rna  "../../data/dataset_final/D15/rna.h5" --atac "../../data/dataset_final/D15/atac.h5"  --save_path "../../result/embedding/vertical integration/D15/MIRA/"
 
 begin_time = time.time()
 def data_loader(path):
@@ -67,17 +69,12 @@ def train_topic_model(data, categorical_cov=None, mod='expression', args=None):
     model.save(sv_nm)
     return sv_nm
 
-    
-
 def run_mira(file_paths, args):
     np.random.seed(0)
     
     rna_path=file_paths['rna_path']
     atac_path=file_paths['atac_path']
-
-    
     assert len(rna_path) == len(atac_path)
-    
 
     if len(rna_path)>1:
         #lgr.info("----> Concatenating RNA data batches....  ("+ str(len(rna_path)) + " batches )")
@@ -100,7 +97,6 @@ def run_mira(file_paths, args):
     sc.pp.neighbors(rna_data, n_pcs=6)
     sc.tl.umap(rna_data, min_dist = 0.2, negative_sample_rate=0.2)
     
-    
     cat_key = 'batch' if USE_BATCH else None
     #--> train RNA topic model if required, otherwise load the model based on the provided path
     if not args.load_model:
@@ -114,8 +110,6 @@ def run_mira(file_paths, args):
     #lgr.info("-----> Loading RNA topic model from "+ rna_topic_model_pth)
     rna_topic_model = mira.topic_model.load_model(rna_topic_model_pth)
     
-    
-
     if len(atac_path)>1:
         #lgr.info("----> Concatenating ATAC data batches....  ("+ str(len(atac_path)) + " batches )")
         atac_data = anndata.concat({'batch'+str(i+1): data_loader(atac_path[i]) for i in range(len(atac_path))}, label='batch', index_unique=':')
