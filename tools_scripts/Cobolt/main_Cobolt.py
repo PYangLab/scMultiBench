@@ -25,7 +25,7 @@ parser.add_argument('--lr',  type=float,  default=0.005, help='path to save the 
 args = parser.parse_args()
 
 # The script of Cobolt for mosaic integration, [RNA, RNA+ATAC, ATAC] data type, the output is joint embedding (dimension reduction)
-# run commond for Cobolt
+# run command for Cobolt
 # python main_Cobolt.py --path1  "../../data/dataset_final/D45/rna1.h5"  --path2 "../../data/dataset_final/D45/rna2.h5" --path3 "../../data/dataset_final/D45/atac2.h5"  --path4 "../../data/dataset_final/D45/atac3.h5" --save_path "../../result/embedding/mosaic integration/D45/Cobolt/"
 
 def h5_to_matrix(path):
