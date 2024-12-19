@@ -12,12 +12,19 @@ from anndata import AnnData
 from scipy.sparse import csr_matrix
 
 parser = argparse.ArgumentParser("totalVI")
-parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to train data2')
+parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to rna')
+parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to adt')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
-begin_time = time.time()
 
+# The totalVI script for vertical&cross integration requires RNA and ADT data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for totalVI
+# vertical integration:
+# python main_totalVI.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/vertical integration/D3/totalVI/"
+# cross integration:
+# python main_totalVI.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/totalVI"
+
+begin_time = time.time()
 scvi.settings.seed = 0
 print("Last run with scvi-tools version:", scvi.__version__)
 
@@ -26,7 +33,6 @@ def data_loader(path):
         X = np.array(f['matrix/data']).transpose()
     adata = AnnData(X=X)
     return adata
-    
     
 def run_totalVI(file_paths):
     rna_path=file_paths['rna_path']
@@ -61,8 +67,6 @@ def run_totalVI(file_paths):
     (adata.obs).index = a
     adata.layers["counts"] = adata.X.copy()
     adata.obsm['protein_expression'] = adt
-    print(np.max(adt))
-    
     
     scvi.model.TOTALVI.setup_anndata(
         adata,
@@ -96,4 +100,4 @@ else:
 file = h5py.File(args.save_path+"/embedding.h5", 'w')
 file.create_dataset('data', data=result)
 file.close()
-np.savetxt(args.save_path+"/time.csv", [all_time], delimiter=",")
+np.savetxt(args.save_path+"time.csv", [all_time], delimiter=",")
