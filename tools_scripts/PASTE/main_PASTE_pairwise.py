@@ -1,5 +1,4 @@
 import os
-import math
 import ot
 import time
 import glob
@@ -10,16 +9,15 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 import paste as pst
-from sklearn.metrics import adjusted_rand_score
-from sklearn.neighbors import NearestNeighbors
-import networkx as nx
-from scipy.spatial import distance_matrix
 # %%
-parser = argparse.ArgumentParser('paste')
+parser = argparse.ArgumentParser('PASTE_pairwise')
 parser.add_argument('--data_dir', default='../unified_data/SCC/patient_2/', help='path to the data directory')
 parser.add_argument('--save_dir', default='./aligned_slices/', help='path to save the output data')
 args = parser.parse_args()
 
+# The PASTE_pairwise script for cross-integration requires spatial data in 'h5ad' format as input, including both gene expression data and spatial coordinates. The output is aligned coordinates (spatial registration).
+# run commond for PASTE_pairwise
+# python main_PASTE_pairwise.py --data_dir '../../data/dataset_final/D60/processed/patient_2/' --save_dir '../../result/registration/D60/PASTE_pairwise/patient_2'
 
 def load_slices_h5ad_scc(data_dir):
     slices = []
@@ -29,7 +27,6 @@ def load_slices_h5ad_scc(data_dir):
         if scipy.sparse.issparse(slice_i.X):
             slice_i.X = slice_i.X.toarray()
         slice_i.obs = slice_i.obs[[]]
-        print(slice_i, "!!!!!!!!!!!!!!!!!")
         slices.append(slice_i)
     return slices
                          
@@ -47,18 +44,13 @@ def aligned_slices_with_label(slices):
     new_slices = pst.stack_slices_pairwise(slices, pis)
     return  pis,new_slices
 
-def center_align(slices):
-    initial_slice = slices[0].copy()
-    lmbda = len(slices)*[1/len(slices)]
-    pst.filter_for_common_genes(slices)
-    b = []
-    for i in range(len(slices)):
-        b.append(pst.match_spots_using_spatial_heuristic(slices[0].X, slices[i].X))
-    center_slice, pis = pst.center_align(initial_slice, slices, lmbda, random_seed = 5, pis_init = b)
-    return center_slice,pis
-
 def whole_process(data_dir,save_dir):
     slices = load_slices_h5ad_scc(data_dir)
     _, aligned_slices = aligned_slices_with_label(slices)
+    os.makedirs(save_dir, exist_ok=True)
+    for i, slice in enumerate(aligned_slices):
+        save_path = os.path.join(save_dir, f"aligned_slice_{i}.h5ad")
+        sc.write(save_path, slice)
+    return aligned_slices
 
 aligned_slices = whole_process(args.data_dir,args.save_dir)
