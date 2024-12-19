@@ -11,10 +11,14 @@ from iPoLNG import iPoLNG
 
 torch.set_default_tensor_type("torch.cuda.FloatTensor" if torch.cuda.is_available() else "torch.FloatTensor")
 parser = argparse.ArgumentParser("iPOLNG")
-parser.add_argument('--path1', metavar='DIR',  default="", help='path to train data1')
-parser.add_argument('--path2', metavar='DIR',  default="", help='path to train data2')
+parser.add_argument('--path1', metavar='DIR',  default="", help='path to RNA')
+parser.add_argument('--path2', metavar='DIR',  default="", help='path to ATAC')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
+
+# The iPOLNG script for vertical integration requires RNA and ATAC data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for iPOLNG
+# python main_iPOLNG.py --path1  "../../data/dataset_final/D15/rna.h5" --path2 "../../data/dataset_final/D15/atac.h5"  --save_path "../../result/embedding/vertical integration/iPOLNG/D15/"
 
 begin_time = time.time()
 def data_loader(path, top_number):
