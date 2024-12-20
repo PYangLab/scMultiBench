@@ -1,12 +1,17 @@
-```{r}
+
 suppressPackageStartupMessages({
   library(Seurat)
   library(dplyr)
   library(rhdf5)
   library(HDF5Array)
 })
-
 source("util.R")
+
+# The script of Seurat WNN for vertical integration, RNA+ADT and RNA+ATAC data types. The output is joint embedding (dimension reduction)
+# run commond for Seurat WNN (RNA+ADT)
+# Rscript main_Seurat_v4.Rmd  '../../data/dataset_final/D3/rna.h5' '../../data/dataset_final/D3/adt.h5' NULL  '../../result/embedding/vertical integration/Seurat_WNN/D3/'
+# run commond for Seurat WNN (RNA+ATAC)
+#Rscript main_Seurat_v4.Rmd   '../../data/dataset_final/D15/rna.h5' NULL '../../data/dataset_final/D15/atac.h5' '../../result/embedding/vertical integration/Seurat_WNN/D15/'
 
 # load parameters from
 args <- commandArgs(trailingOnly = TRUE)
@@ -15,12 +20,7 @@ adt_path <- args[2]
 atac_path <- args[3] 
 save_path <- args[4] 
 
-rna_path <- "../../../dataset/benchmark_dataset/vertical integration/dataset3/rna.h5"
-adt_path <- "../../../dataset/benchmark_dataset/vertical integration/dataset3/adt.h5"
 begin_time <- Sys.time()
-rna <- "NULL"
-adt <- "NULL"
-atac <- "NULL"
 if (rna_path!="NULL"){rna <- h5_to_matrix(rna_path)} else{rna <- "NULL"}
 if (adt_path!="NULL"){adt <- h5_to_matrix(adt_path)} else{adt <- "NULL"}
 if (atac_path!="NULL"){atac <- h5_to_matrix(atac_path)} else{atac <- "NULL"}
@@ -28,8 +28,6 @@ if ((rna_path!="NULL") & (adt_path!="NULL")){result <- run_Seurat_RNA_ADT(rna,ad
 if ((rna_path!="NULL") & (atac_path!="NULL")){result <- run_Seurat_RNA_ATAC(rna,atac)}
 if ((adt_path!="NULL") & (atac_path!="NULL")){result <- run_Seurat_ADT_ATAC(adt,atac)}
 if ((rna_path!="NULL") & (adt_path!="NULL") & (atac_path!="NULL")){result <- run_Seurat_RNA_ADT_ATAC(rna,adt,atac)}
-
-
 
 run_Seurat_RNA_ADT <- function(rna, adt){
   bm <- CreateSeuratObject(counts = rna)
@@ -63,10 +61,8 @@ run_Seurat_RNA_ADT <- function(rna, adt){
 }
 
 
-
-
-embedding <- result[['weighted.nn']]@nn.dist
-embedding = t(embedding)
+dist <- result[['weighted.nn']]@nn.dist
+idx <- result[['weighted.nn']]@nn.idx
 end_time <- Sys.time()
 all_time <- difftime(end_time, begin_time, units="secs")
 
@@ -74,7 +70,9 @@ if (!dir.exists(save_path)) {
   dir.create(save_path, recursive = TRUE)
   print("path create")
 }
-write_h5(exprs_list = list(rna = embedding), 
-             h5file_list = c(paste0(save_path,"embedding.h5")))
+write_h5(exprs_list = list(rna = dist), 
+             h5file_list = c(paste0(save_path,"dist.h5")))
+write_h5(exprs_list = list(rna = idx), 
+             h5file_list = c(paste0(save_path,"idx.h5")))
+saveRDS(result[['weighted.nn']], file = paste0(save_path,"graph.rds"))
 write.csv(all_time, paste0(save_path,"time.csv"))
-```
