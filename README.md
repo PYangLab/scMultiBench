@@ -1,7 +1,5 @@
-# scMultiBench
-
 <h1>
-  <img src="figure/logo.png" alt="Logo" style="width:50px; vertical-align:middle;">
+  <img src="figure/logo.png" alt="Logo" style="width:30px; vertical-align:middle;">
   scMultiBench
 </h1>
 
