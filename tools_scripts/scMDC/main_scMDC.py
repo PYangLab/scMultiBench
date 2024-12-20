@@ -7,15 +7,13 @@ import random
 import numpy as np
 from utils import *
 import scanpy as sc
-from time import time
+import time
 import torch.nn as nn
 import torch.nn.functional as F
 from scMDC_batch import scMultiClusterBatch
 from preprocess import read_dataset, normalize
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import DataLoader, TensorDataset
-
-random.seed(1)
 
 if __name__ == "__main__":
     # setting the hyper parameters
@@ -58,12 +56,22 @@ if __name__ == "__main__":
     parser.add_argument('--nbatch', default=2, type=int)
     parser.add_argument('--run', default=1, type=int)
     parser.add_argument('--device', default='cuda')
-    parser.add_argument('--path1', metavar='DIR', default=[], nargs='+',  help='path to train data1')
-    parser.add_argument('--path2', metavar='DIR', default=[], nargs='+',  help='path to train data2')
-    parser.add_argument('--path3', metavar='DIR', default=[], nargs='+',  help='path to train data3')
+    parser.add_argument('--path1', metavar='DIR', default=[], nargs='+',  help='path to RNA')
+    parser.add_argument('--path2', metavar='DIR', default=[], nargs='+',  help='path to ADT/ATAC')
     parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
     args = parser.parse_args()
     print(args)
+
+# The scMDC script for vertical/cross integration requires one/multiple matched RNA+ADT or RNA+ATAC data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for scMDC (RNA+ADT)
+# python main_scMDC.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/D3/scMDC/" --nbatch 1  --n_clusters 26
+# run commond for scMDC (RNA+ATAC)
+# python main_scMDC.py --path1 "../../data/dataset_final/D15/rna.h5" --path2 "../../data/dataset_final/D15/atac.h5"  --save_path "../../result/embedding/D15/scMDC/" --nbatch 1  --n_clusters 13
+# run commond for scMDC (multiple RNA+ADT)
+# python main_scMDC.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/scMDC" --nbatch 2 --n_clusters 17
+# run commond for scMDC (multiple RNA+ATAC)
+# python main_scMDC.py --path1 "../../data/dataset_final/SD18/rna1.h5" "../../data/dataset_final/SD18/rna2.h5" --path2 "../../data/dataset_final/SD18/atac1.h5" "../../data/dataset_final/SD18/atac2.h5"  --save_path "../../result/embedding/cross integration/SD18/scMDC/" --nbatch 2 --n_clusters 5
+
 
     begin_time = time.time()
     def data_loader(path):
