@@ -2,6 +2,10 @@ library(rliger)
 library(rhdf5)
 library(HDF5Array)
 
+# The script of online iNMF for diagonal integration, [RNA, ATAC] data type, ATAC needs to be coverted into gene activity score. The output is joint embedding (dimension reduction)
+# run commond for online iNMF
+# Rscript main_online_iNMF.Rmd  '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/atac_gas.h5' '../../result/embedding/diagonal integration/D27/online_iNMF/'
+
 # useful functions
 h5_to_matrix <- function(path){
     h5_data <- h5read(path,"matrix") 
@@ -39,9 +43,11 @@ runiNMF<- function(path_list){
   }
   pbmcs <- createLiger(data)
   pbmcs <- rliger::normalize(pbmcs)
-  pbmcs <- selectGenes(pbmcs, var.thresh = 0.2, do.plot = F) 
+  pbmcs <- selectGenes(pbmcs, var.thresh = 0.2) 
   pbmcs <- scaleNotCenter(pbmcs)
-  pbmcs <- online_iNMF(pbmcs, k = 20, miniBatch_size = 5000, max.epochs = 5)
+  pbmcs <- runIntegration(pbmcs, k = 20, method = "online")
+  #pbmcs <- online_iNMF(pbmcs, k = 20, miniBatch_size = 5000, max.epochs = 5)
+  pbmcs <- quantileNorm(pbmcs)
   result <- pbmcs@H.norm
   return (result)
 }
@@ -71,5 +77,4 @@ print(all_time)
 write.csv(rownames(result), paste0(save_path,"barcode.csv"))
 write_h5(exprs_list = list(rna = result), 
              h5file_list = c(paste0(save_path,"embedding.h5")))
-
 
