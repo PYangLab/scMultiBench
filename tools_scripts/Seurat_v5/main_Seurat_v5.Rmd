@@ -1,9 +1,14 @@
+
 library(Seurat)
 library(dplyr)
 library(ggplot2)
 library(HDF5Array)
 library(Signac)
 library(glue)
+
+# The script of Seurat v5 for diagonal integration, [RNA, ATAC] data type, where peak are needed. In addition, this method needs a bridge multimodality. The output is joint embedding (dimension reduction)
+# run commond for Seurat v5
+# Rscript main_Seurat_v5.Rmd  '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/atac_peak.h5' '../../data/dataset_final/D27/atac_peak.h5' '../../result/embedding/diagonal integration/D27/Seurat_bridge/' 
 
 h5_to_matrix <- function(path){
     h5_data <- h5read(path, "matrix") 
@@ -34,7 +39,8 @@ run_Seurat_atac_peak <- function(path_rna1,path_rna2,path_atac2,path_atac3,save_
   rna_count <- h5_to_matrix(path_rna2)
   atac_count <- h5_to_matrix(path_atac2)
   obj.multi  <- CreateSeuratObject(counts = rna_count)
-  obj.atac  <- CreateChromatinAssay(counts = atac_count, sep = c(":", "-"))
+  print(rownames(atac_count)[1:10])
+  obj.atac  <- CreateChromatinAssay(counts = atac_count, sep = c("-", "-"))
   obj.multi[["ATAC"]] <- obj.atac
 
   rna_count <- h5_to_matrix(path_rna1)
@@ -43,7 +49,7 @@ run_Seurat_atac_peak <- function(path_rna1,path_rna2,path_atac2,path_atac3,save_
     RunUMAP(dims = 1:50, return.model = TRUE)
 
   atac_count <- h5_to_matrix(path_atac3)
-  ATAC_assay <- CreateChromatinAssay(counts = atac_count, sep = c(":", "-"))
+  ATAC_assay <- CreateChromatinAssay(counts = atac_count, sep = c("-", "-"))
   obj.atac  <- CreateSeuratObject(counts = ATAC_assay,assay = 'ATAC') 
 
 # normalize multiome RNA
@@ -99,7 +105,9 @@ if (!dir.exists(save_path)) {
 }
 print(dim(result[[1]]))
 print(all_time)
-write_h5(exprs_list = list(rna = result[[1]]), h5file_list = c(paste0(save_path,"embedding1.h5")))
-write_h5(exprs_list = list(rna = result[[2]]), h5file_list = c(paste0(save_path,"embedding2.h5")))
+
+embedding <- rbind(result[[1]], result[[2]])
+write_h5(exprs_list = list(embedding = embedding), 
+             h5file_list = c(paste0(save_path,"embedding.h5")))
 write.csv(all_time, paste0(save_path,"time.csv"))
 
