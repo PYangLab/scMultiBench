@@ -5,19 +5,20 @@ import argparse
 import numpy as np
 import scanpy as sc
 from anndata import AnnData
-from scipy.sparse import csr_matrix
 import vipcca.tools.utils as tl
 import vipcca.model.vipcca as vip
-import vipcca.tools.plotting as pl
-import vipcca.tools.transferLabel as tfl
+from scipy.sparse import csr_matrix
 
 random.seed(42)
 parser = argparse.ArgumentParser("VIPCCA")
-# Data configs
-parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train gene')
-parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train peak')
+parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to rna')
+parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to atac')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
+
+# The VIPCCA script for diagonal integration requires RNA and ATAC data as input, where ATAC needs to be transformed into gene activity score. The output is a joint embedding (dimensionality reduction).
+# run commond for VIPCCA
+# python main_VIPCCA.py --path1 "../../data/dataset_final/D27/rna.h5" --path2 "../../data/dataset_final/D27/atac_gas.h5" --save_path "../../result/embedding/diagonal integration/D27/VIPCCA/"
 
 def data_loader(path):
     with h5py.File(path, "r") as f:
@@ -52,8 +53,6 @@ if not os.path.exists(args.save_path):
     print("create path")
 else:
     print("the path exits")
-
 file = h5py.File(args.save_path+"/embedding.h5", 'w')
 file.create_dataset('data', data=result)
 file.close()
-
