@@ -1,10 +1,14 @@
+
 library(rhdf5)
 library(Seurat)
 library(Signac)
 library(ggplot2)
 library(cowplot)
 library(HDF5Array)
-library(EnsDb.Hsapiens.v86)
+
+# The script of Seurat v3 for diagonal integration, [RNA, ATAC] data type, both the peak and gene activity score are needed. The output is joint embedding (dimension reduction)
+# run commond for Seurat v3
+# Rscript main_Seurat_v3.Rmd  '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/atac_peak.h5' '../../data/dataset_final/D27/atac_gas.h5' '../../data/dataset_final/D27/rna_cty.csv' '../../result/embedding/diagonal integration/D27/Seurat_v3/'
 
 h5_to_matrix <- function(path){
     h5_data <- h5read(path,"matrix") 
@@ -32,14 +36,16 @@ write_h5 <- function(exprs_list, h5file_list) {
 }
 
 # wrap function for seurat v3
-runSeurat<- function(rna_path, atac_path, gene.activities_path, rna_cty_path){
+runSeurat<- function(rna_path, atac_path, gene.activities_path, rna_cty_path, atac_cty_path){
   rna <- h5_to_matrix(rna_path)
   atac <- h5_to_matrix(atac_path)
   gene.activities <- h5_to_matrix(gene.activities_path)
+  colnames(gene.activities) <- colnames(atac)
   rna_seurat <- CreateSeuratObject(counts = rna)
   rna_cty <- read.csv(rna_cty_path)$x
   rna_seurat$annotation <- rna_cty
-  atac_seurat <-CreateChromatinAssay(counts = atac, sep = c(":", "-")) 
+  print(rownames(atac)[1:10])
+  atac_seurat <-CreateChromatinAssay(counts = atac, sep = c("-", "-")) 
   atac_seurat  <- CreateSeuratObject(counts = atac_seurat, assay = 'ATAC') 
 
   rna_seurat <- NormalizeData(rna_seurat)
@@ -47,24 +53,19 @@ runSeurat<- function(rna_path, atac_path, gene.activities_path, rna_cty_path){
   rna_seurat <- ScaleData(rna_seurat)
   rna_seurat <- RunPCA(rna_seurat)
   rna_seurat <- RunUMAP(rna_seurat, dims = 1:30)
-  
-  annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
-  seqlevelsStyle(annotations) <- "UCSC"
-  genome(annotations) <- "hg38"
-  Annotation(atac_seurat) <- annotations
 
   atac_seurat <- RunTFIDF(atac_seurat)
   atac_seurat <- FindTopFeatures(atac_seurat, min.cutoff = "q0")
   atac_seurat <- RunSVD(atac_seurat)
   atac_seurat <- RunUMAP(atac_seurat, reduction = "lsi", dims = 2:30, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
   
-  # we directly read the gene activities obtained from CreateGeneActivityMatrix function in the old Seurat version as this function doesn't need fragment information
   atac_seurat[["ACTIVITY"]] <- CreateAssayObject(counts = gene.activities)
   # normalize gene activities
   DefaultAssay(atac_seurat) <- "ACTIVITY"
   atac_seurat <- NormalizeData(atac_seurat)
   atac_seurat <- ScaleData(atac_seurat, features = rownames(atac_seurat))
-
+  atac_seurat$seurat_annotations <- read.csv(atac_cty_path)$x
+  
   # Identify anchors
   transfer.anchors <- FindTransferAnchors(reference = rna_seurat, query = atac_seurat, features =
                                             VariableFeatures(object = rna_seurat),
@@ -90,7 +91,7 @@ runSeurat<- function(rna_path, atac_path, gene.activities_path, rna_cty_path){
   result_rna <- t(result_rna)
   result_atac <- result[(dim(rna)[2]+1):dim(result)[1],]
   result_atac <- t(result_atac)
-  return (list(result_rna, result_atac, atac_seurat$predicted.id))
+  return (list(result_rna, result_atac, atac_seurat$predicted.id, atac_seurat$seurat_annotations))
 }
 
 # load data, the input is RNA counts and ATAC gene activity score counts
@@ -100,12 +101,18 @@ rna_path <- args[1]
 atac_path <- args[2] 
 gene_activity_path <- args[3] 
 rna_cty_path <- args[4] 
-save_path <- args[5] 
+atac_cty_path <- args[5] 
+save_path <- args[6] 
 rna_path <- unlist(strsplit(rna_path, ",")) 
 atac_path <- unlist(strsplit(atac_path, ","))
-gene.activities_path <- unlist(strsplit(atac_path, ","))
-rna_cty_path <- unlist(strsplit(rna_cty_path, ","))
-result <- runSeurat(rna_path, atac_path)
+gene.activities_path <- unlist(strsplit(gene_activity_path, ","))
+
+print(rna_path)
+print(atac_path)
+print(rna_cty_path)
+print(gene.activities_path)
+
+result <- runSeurat(rna_path, atac_path, gene.activities_path, rna_cty_path, atac_cty_path)
 end_time <- Sys.time()
 all_time <- end_time - begin_time
 
@@ -116,7 +123,7 @@ if (!dir.exists(save_path)) {
 }
 embedding <- cbind(result[[1]], result[[2]])
 write_h5(exprs_list = list(embedding = embedding), 
-             h5file_list = c(paste(save_path,"embedding.h5")))
-write_h5(exprs_list = list(predict.cty = result[[3]]), 
-             h5file_list = c(paste(save_path,"predict_cty.h5")))
+             h5file_list = c(paste0(save_path,"embedding.h5")))
+write.csv(result[[3]], c(paste0(save_path,"predict.csv")))
+write.csv(result[[4]], c(paste0(save_path,"query.csv")))
 
