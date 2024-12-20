@@ -11,32 +11,37 @@ import anndata as ad
 import multigrate as mtg
 import scipy.sparse as sp
 
-random.seed(1)
 parser = argparse.ArgumentParser("Multigrate")
-parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to train data2')
-parser.add_argument('--path3', metavar='DIR', nargs='+', default=[], help='path to train data3')
+parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to rna')
+parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to adt')
+parser.add_argument('--path3', metavar='DIR', nargs='+', default=[], help='path to atac')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 parser.add_argument('--epochs', type = int, default=200, help='')
+parser.add_argument('--bs', type = int, default=256, help='')
 parser.add_argument('--lr', type = float, default=1e-3, help='')
-        
 args = parser.parse_args()
+
+# The Multigrate script is designed for both vertical and cross integration.
+# example for vertical integration (rna+adt)
+# python main_Multigrate_paired_integration.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/vertical integration/D3/Multigrate"
+# example for vertical integration (rna+adt+atac)
+# python main_Multigrate_paired_integration.py --path1 "../../data/dataset_final/D23/rna.h5" --path2 "../../data/dataset_final/D23/adt.h5"   --path3 "../../data/dataset_final/D23/atac.h5"  --save_path "../../result/embedding/vertical integration/D23/Multigrate"
+# example for cross integration (multiple rna+adt)
+# python main_Multigrate_paired_integration.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/Multigrate"
 
 begin_time = time.time()
 
-    
 def process_rna(adata_rna):
     sc.pp.normalize_total(adata_rna, target_sum=1e4)
     sc.pp.log1p(adata_rna)
     print(adata_rna)
-    #adata_rna.X = np.array(adata_rna.X)
     sc.pp.highly_variable_genes(adata_rna, n_top_genes=4000) 
     return adata_rna
     
 def process_atac(adata_atac):
+    print(adata_atac)
     sc.pp.normalize_total(adata_atac, target_sum=1e4)
     sc.pp.log1p(adata_atac)
-    #adata_atac.X = np.array(adata_atac.X)
     sc.pp.highly_variable_genes(adata_atac, n_top_genes=20000) 
     return adata_atac
 
@@ -47,12 +52,6 @@ def process_adt(adata_adt):
 def h5_to_matrix(path):
     with h5py.File(path, "r") as f:
         X = (np.array(f['matrix/data']).transpose())
-        #barcodes = []
-        #for key in f['matrix/barcodes']:
-        #    barcodes.append(key.decode('UTF-8')) 
-        #features = []
-        #for key in f['matrix/features']:
-        #    features.append(key.decode('UTF-8'))
     return X
 
 def read_h5_data(rna_path=None, adt_path=None, atac_path=None, list_len=3):
@@ -117,10 +116,8 @@ def read_h5_data(rna_path=None, adt_path=None, atac_path=None, list_len=3):
     if (rna_path is None) and (adt_path is not None) and (atac_path is not None):
         adata_adt = process_adt(ad.AnnData(np.concatenate(adt_list, axis=0)))
         adata_atac = process_atac(ad.AnnData(np.concatenate(atac_list, axis=0)))
-        result = {"adt": adata_adt, "atac": adata_atac}
-        
+        result = {"adt": adata_adt, "atac": adata_atac}        
     return result, np.concatenate(batch,0)
-
 
 def run_Multigrate(file_paths):
     if (file_paths['rna_path'] is not None) and (file_paths['adt_path'] is not None) and (file_paths['atac_path'] is None):
@@ -145,7 +142,7 @@ def run_Multigrate(file_paths):
             n_layers_encoders=[2, 2],
             n_layers_decoders=[2, 2],
         )
-        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=256)
+        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=args.bs)
         model.get_latent_representation()
         latent_space = adata.obsm['latent']
         latent_space1 = latent_space[0:sum(batch==1)[0],:]
@@ -177,7 +174,7 @@ def run_Multigrate(file_paths):
             n_layers_encoders=[2, 2],
             n_layers_decoders=[2, 2],
         )
-        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=256)
+        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=args.bs)
         model.get_latent_representation()
         latent_space = adata.obsm['latent']
         latent_space1 = latent_space[0:sum(batch==1)[0],:]
@@ -209,7 +206,7 @@ def run_Multigrate(file_paths):
             n_layers_encoders=[2, 2],
             n_layers_decoders=[2, 2],
         )
-        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=256)
+        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=args.bs)
         model.get_latent_representation()
         latent_space = adata.obsm['latent']
         latent_space1 = latent_space[0:sum(batch==1)[0],:]
@@ -242,7 +239,7 @@ def run_Multigrate(file_paths):
             n_layers_encoders=[2, 2, 2],
             n_layers_decoders=[2, 2, 2],
         )
-        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=256)
+        model.train(max_epochs=args.epochs, lr=args.lr, batch_size=args.bs)
         model.get_latent_representation()
         latent_space = adata.obsm['latent']
         latent_space1 = latent_space[0:sum(batch==1)[0],:]

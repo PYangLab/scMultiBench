@@ -2,31 +2,29 @@ import os
 import time
 import h5py
 import muon
-import random
 import argparse
 import numpy as np
 import scanpy as sc
 import pandas as pd
 import anndata as ad
 import multigrate as mtg
-import scipy.sparse as sp
 from scipy.sparse import csr_matrix
 
-random.seed(1)
 parser = argparse.ArgumentParser("Multigrate")
-parser.add_argument('--path1', metavar='DIR', default="", help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', default="", help='path to train data2')
-parser.add_argument('--path3', metavar='DIR', default="", help='path to train data2')
-parser.add_argument('--path4', metavar='DIR', default="", help='path to train data2')
+parser.add_argument('--path1', metavar='DIR', default="", help='path to train RNA')
+parser.add_argument('--path2', metavar='DIR', default="", help='path to train RNA of CITEseq')
+parser.add_argument('--path3', metavar='DIR', default="", help='path to train ADT of CITEseq')
+parser.add_argument('--path4', metavar='DIR', default="", help='path to train ADT')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 parser.add_argument('--epochs', type = int, default=200, help='')
 parser.add_argument('--lr', type = float, default=1e-4, help='')
-        
 args = parser.parse_args()
 
-begin_time = time.time()
+# This Multigrate script is designed for mosaic integration for [RNA, RNA+ADT, ADT] data type.
+# example for mosaic integration ([RNA, RNA+ADT, ADT])
+# python main_Multigrate_mosaic_rna_adt.py --path1  "../../data/dataset_final/D39/rna1.h5" --path2 "../../data/dataset_final/D39/rna2.h5" --path3 "../../data/dataset_final/D39/adt2.h5" --path4 "../../data/dataset_final/D39/adt3.h5" --save_path "../../result/embedding/mosaic integration/D39/Multigrate/"
 
-    
+begin_time = time.time()
 def process_rna(adata_rna,barcodes,featurs):
     adata_rna.layers['counts'] = adata_rna.X
     adata_rna.obs.index = barcodes
@@ -39,7 +37,7 @@ def process_atac(adata_atac,barcodes,featurs):
     adata_atac.layers['counts'] = adata_atac.X
     adata_atac.obs.index = barcodes
     adata_atac.var_names = featurs
-    sc.pp.normalize_total(adata_atac, target_sum=20000)
+    sc.pp.normalize_total(adata_atac, target_sum=1e4)
     sc.pp.log1p(adata_atac)
     return adata_atac
 
@@ -50,7 +48,6 @@ def process_adt(adata_adt,barcodes,featurs):
     muon.prot.pp.clr(adata_adt)
     return adata_adt
     
-
 def h5_to_matrix(path):
     with h5py.File(path, "r") as f:
         X = csr_matrix(np.mat(np.array(f['matrix/data']).transpose()))
@@ -66,7 +63,6 @@ rna_path1 = args.path1
 rna_path2 = args.path2
 adt_path2 = args.path3
 adt_path3 = args.path4
-
 
 rna1, barcodes1, rna_features = h5_to_matrix(rna_path1)
 rna2, barcodes2, rna_features = h5_to_matrix(rna_path2)
@@ -114,13 +110,9 @@ model = mtg.model.MultiVAE(
     integrate_on='Modality',
     mmd='marginal',
 )
-
 model.train( lr=args.lr)
-
 model.get_latent_representation()
 result = adata.obsm['latent']
-
-
 end_time = time.time()
 all_time = end_time - begin_time
 print(all_time)
@@ -131,10 +123,7 @@ if not os.path.exists(args.save_path):
     print("create path")
 else:
     print("the path exits")
-
-
 file = h5py.File(args.save_path+"/embedding.h5", 'w')
 file.create_dataset('data', data=result)
 file.close()
-
 np.savetxt(args.save_path+"/time.csv", [all_time], delimiter=",")
