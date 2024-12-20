@@ -9,6 +9,10 @@ from model_utils import Net
 from eval_utils import infer_result, save_result
 from data_utils import prepare_dataloader, partition_data, adjacency
 
+# The scBridge script for diagonal integration requires RNA and ATAC data as input and the cell type labels, where ATAC needs to be transformed into gene activity score. The output is a joint embedding (dimensionality reduction).
+# run commond for scBridge
+# python main_scBridge.py --data_path="../../data/dataset_final/D27/" --source_data="rna.h5" --target_data="atac_gas.h5" --source_cty "rna_cty.csv" --target_cty "atac_cty.csv" --save_path="../../result/embedding/diagonal integration/D27/scBridge/"  --umap_plot
+
 def main(args):
     (
         source_dataset,
