@@ -1,5 +1,3 @@
-############## this method needs to have a reference ##################
-
 import os
 import sys
 import h5py
@@ -66,12 +64,17 @@ parser.add_argument('--r_dim', type=int, default=1)
 parser.add_argument('--p_dim', type=int, default=1)
 parser.add_argument('--deterministic_warmup', type=int, default=50, metavar='W',
                     help='deterministic warmup')
-
-# args
 args = parser.parse_args()
 
-
-
+# The scMM script for vertical/cross integration requires one/multiple matched RNA+ADT or RNA+ATAC data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for scMM (RNA+ADT)
+# python main_scMM.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/D3/" --model rna_protein
+# run commond for scMM (RNA+ATAC)
+# python main_scMM.py --path1 "../../data/dataset_final/D15/rna.h5" --path2 "../../data/dataset_final/D15/atac.h5"  --save_path "../../result/embedding/D15/" --model rna_atac
+# run commond for scMM (multiple RNA+ADT)
+# python main_scMM.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/scMM" rna_protein
+# run commond for scMM (multiple RNA+ATAC)
+# python main_scMM.py --path1 "../../data/dataset_final/SD18/rna1.h5" "../../data/dataset_final/SD18/rna2.h5" --path2 "../../data/dataset_final/SD18/atac1.h5" "../../data/dataset_final/SD18/atac2.h5"  --save_path "../../result/embedding/cross integration/SD18/scMM/" --model rna_atac
 
 # random seed
 # https://pytorch.org/docs/stable/notes/randomness.html
@@ -317,7 +320,7 @@ if __name__ == '__main__':
             result = train_result
         print(result.shape)
         
-        uni, cross = predict(train_loader, 'test', runPath)
+        #uni, cross = predict(train_loader, 'test', runPath)
                 
         if not os.path.exists(args.save_path):
             os.makedirs(args.save_path)
