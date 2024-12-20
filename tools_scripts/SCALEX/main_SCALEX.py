@@ -5,18 +5,20 @@ import random
 import argparse
 import numpy as np
 import scanpy as sc
-from anndata import AnnData
 from scalex import SCALEX
+from anndata import AnnData
 
-random.seed(1)
-###
 parser = argparse.ArgumentParser("SCALEX")
 parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train data1')
 parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train data2')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
-begin_time = time.time()
 
+# The SCALEX script for diagonal integration requires RNA and ATAC data as input, where ATAC needs to be transformed into gene activity score. The output is a joint embedding (dimensionality reduction).
+# run commond for SCALEX
+# python main_SCALEX.py --path1 "../../data/dataset_final/D27/rna.h5" --path2 "../../data/dataset_final/D27/atac_gas.h5" --save_path "../../result/embedding/diagonal integration/D27/SCALEX/"
+
+begin_time = time.time()
 def data_loader(path):
     with h5py.File(path, "r") as f:
         X = np.array(f['matrix/data']).transpose()
@@ -28,8 +30,6 @@ adata_atac = data_loader(args.path2)
     
 adata = adata_rna.concatenate(adata_atac, join='inner', batch_key='batch')
 adata.write('RNA-ATAC.h5ad')
-
-
 sc.pp.filter_genes(adata, min_cells=0)
 sc.pp.normalize_total(adata, inplace=True)
 sc.pp.log1p(adata)
@@ -49,15 +49,12 @@ adata = SCALEX(data_list = [wk_dir+'RNA-ATAC.h5ad'],
               show=False,
               gpu=0)
               
-            
 embedding = adata.obsm['latent']
-
 if not os.path.exists(args.save_path):
     os.makedirs(args.save_path)
     print("create path")
 else:
     print("the path exits")
-    
 file = h5py.File(args.save_path+"/embedding.h5", 'w')
 file.create_dataset('data', data=embedding)
 file.close()
