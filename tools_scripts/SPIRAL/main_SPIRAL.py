@@ -19,12 +19,14 @@ from spiral.main import SPIRAL_integration
 from Process.Spatial_Net import Cal_Spatial_Net
 from spiral.CoordAlignment import CoordAlignment
 from sklearn.metrics.pairwise import euclidean_distances
+from scipy.spatial import distance_matrix
+from sklearn.neighbors import NearestNeighbors, KNeighborsRegressor
+from sklearn.metrics import adjusted_rand_score
+import math
+import ot
 
 warnings.filterwarnings('ignore', category=pd.errors.PerformanceWarning)
 warnings.filterwarnings('ignore', category=FutureWarning)
-
-# %%
-#robjects.r('install.packages("mclust", repos="http://cran.r-project.org")')
 
 # %%
 parser = argparse.ArgumentParser('spiral')
@@ -32,28 +34,22 @@ parser.add_argument('--data_dir', default='../unified_data/SCC/patient_2/', help
 parser.add_argument('--save_dir', default='./aligned_slices/', help='path to save the output data')
 args = parser.parse_args()
 
+# The SPIRAL script for cross-integration requires spatial data in 'h5ad' format as input, including both gene expression data and spatial coordinates. The output is aligned coordinates (spatial registration).
+# run commond for SPIRAL
+# python main_SPIRAL.py --data_dir '../../data/dataset_final/D60/processed/patient_2/' --save_dir '../../result/registration/D60/SPIRAL/patient_2'
+
 # %%
 def load_slices_h5ad(data_dir):
     slices = []
     file_paths = glob.glob(data_dir + "*.h5ad")
     for file_path in file_paths:
         slice_i = sc.read_h5ad(file_path)
-        
         if scipy.sparse.issparse(slice_i.X):
             slice_i.X = slice_i.X.toarray()
-        
-        n_counts = slice_i.obs['n_genes']
-        ground_truth = slice_i.obs['Ground_Truth']
-        slice_i.obs = pd.DataFrame({'n_counts': n_counts, 'Ground Truth': ground_truth})
-        slice_i.var = pd.DataFrame({'n_counts': slice_i.var['n_cells']})
-        #slice_i.var = pd.DataFrame({'n_counts': slice_i.var['n_counts']})
+            slice_i.obs = slice_i.obs[[]]
         slices.append(slice_i)
-    
     return slices
 
-
-
-# %%
 def create_flags(num_slices,file_names):
     extracted_numbers = [name.split('_')[0] for name in file_names]
     sample_name = extracted_numbers
@@ -64,8 +60,6 @@ def create_flags(num_slices,file_names):
     flags=flags+"_"
     return sample_name, flags
 
-# %%
-# https://github.com/guott15/SPIRAL/blob/main/Demo/GenerateEdges.ipynb
 def Generate_Edges(dirs,slices,sample_name,flags):
     knn=6
     processed_slices = [slice.copy() for slice in slices]
@@ -116,8 +110,8 @@ def label_position_features(dirs,slices,file_names,flags):
         cells=[str(sample_name[IDX[k]])+'-'+i for i in adata.obs_names]
         mat1=pd.DataFrame(adata.X,columns=adata.var_names,index=cells)
         coord1=pd.DataFrame(adata.obsm['spatial'],columns=['x','y'],index=cells)
-        meta1=adata.obs[['Ground Truth', 'batch']]
-        meta1.columns=['celltype','batch']
+        meta1=adata.obs[[ 'batch']]
+        meta1.columns=['batch']
         meta1.index=cells
         meta1.to_csv(dirs+"gtt_input_scanpy/"+flags+str(sample_name[IDX[k]])+"_label-1.txt")
         coord1.to_csv(dirs+"gtt_input_scanpy/"+flags+str(sample_name[IDX[k]])+"_positions-1.txt")
@@ -133,17 +127,7 @@ def label_position_features(dirs,slices,file_names,flags):
 # https://github.com/guott15/SPIRAL/blob/main/Demo/run_spiral_DLPFC.ipynb
 def process_1(data_dir,dirs,file_names,num_slices):
     sample_name, flags = create_flags(num_slices,file_names)
-
-
     slices = load_slices_h5ad(data_dir)
-
-    
-    unique_layers = set()
-    for slice in slices:
-        unique_layers.update(slice.obs['Ground Truth'].unique())
-
-    n_clust = len(unique_layers)
-
     Generate_Edges(dirs,slices,sample_name, flags)
     label_position_features(dirs,slices,file_names,flags)
     extracted_numbers = [name.split('_')[0] for name in file_names]
@@ -195,8 +179,9 @@ def process_1(data_dir,dirs,file_names,num_slices):
     parser.add_argument('--N_WALK_LEN', type=int, default=N_WALK_LEN, help='number of walks of random work for negative pairs.')
     parser.add_argument('--NUM_NEG', type=int, default=NUM_NEG, help='number of negative pairs.')
 
-    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train.')
-    parser.add_argument('--batch_size', type=int, default=1024, help='Size of batches to train.') ####512 for withon donor;1024 for across donor###
+    parser.add_argument('--epochs', type=int, default=2, help='Number of epochs to train.')
+    #parser.add_argument('--epochs', type=int, default=1, help='Number of epochs to train.')
+    parser.add_argument('--batch_size', type=int, default=512, help='Size of batches to train.') ####512 for withon donor;1024 for across donor###
     parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate.')
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='Weight decay.')
     parser.add_argument('--alpha1', type=float, default=N, help='Weight of decoder loss.')
@@ -208,12 +193,12 @@ def process_1(data_dir,dirs,file_names,num_slices):
 
     params,unknown=parser.parse_known_args()
 
-    return params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,n_clust
+    return params,feat_file,edge_file,meta_file,coord_file,sample_name,flags
 
-# %%
-def process_2(params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,n_clust,spot_size=20):
+def process_2(params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,spot_size=20):
     dirs = './txt_file/'
     SPII=SPIRAL_integration(params,feat_file,edge_file,meta_file)
+    print("begin timming")
     SPII.train()
     # if not os.path.exists(dirs+"model/"):
     #     os.makedirs(dirs+"model/")
@@ -245,25 +230,17 @@ def process_2(params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,
     xbar_new1.to_csv(dirs+"gtt_output/SPIRAL"+flags+"_correct_"+str(SPII.params.batch_size)+".csv")
     
     meta=SPII.meta.values
-
-
-
-
     ann=anndata.AnnData(SPII.feat)
+
     ann.obsm['spiral']=embed1.iloc[:,SPII.params.znoise_dim:].values
     sc.pp.neighbors(ann,use_rep='spiral')
-
-    
-    # res1=0.5 ####adjust to make sure 7 clusters
-    # res2=0.5
-    # sc.tl.leiden(ann,resolution=res1)
-    # sc.tl.louvain(ann,resolution=res2)
-    ann = mclust_R(ann, used_obsm='spiral', num_cluster=n_clust)
+    ann = mclust_R(ann, used_obsm='spiral', num_cluster=30)
 
     ann.obs['batch']=SPII.meta.loc[:,'batch'].values
     ub=np.unique(ann.obs['batch'])
     sc.tl.umap(ann)
     coord=pd.read_csv(coord_file[0],header=0,index_col=0)
+
     for i in np.arange(1,len(sample_name)):
         coord=pd.concat((coord,pd.read_csv(coord_file[i],header=0,index_col=0)))
 
@@ -289,13 +266,7 @@ def process_2(params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,
     if not os.path.exists(dirs+"metrics"):
         os.makedirs(dirs+"metrics")
     pd.DataFrame(ann.obs['SPIRAL_refine']).to_csv(cluster_file_save)
-
-
-
     return ann,embed_file,cluster_file
-
-# %%
-#https://github.com/guott15/SPIRAL/blob/main/Demo/run_spiral_DLPFC.ipynb
 
 def coord_align(ann,flags,meta_file,coord_file,embed_file,cluster_file,sample_name,data_dir,file_names):
     knn=6
@@ -311,8 +282,6 @@ def coord_align(ann,flags,meta_file,coord_file,embed_file,cluster_file,sample_na
         dis=euclidean_distances(ann1.obsm['spatial'],ann1.obsm['spatial'])
         refined_pred=refine(sample_id, pred, dis, num_nbs=knn)
         ann.obs['SPIRAL_refine'][idx]=refined_pred
-
-        
     cluster_file_save=dirs+"metrics/spiral"+flags+"_mclust_modify.csv"
     pd.DataFrame(ann.obs['SPIRAL_refine']).to_csv(cluster_file_save)
     clust_cate='louvain'
@@ -321,105 +290,53 @@ def coord_align(ann,flags,meta_file,coord_file,embed_file,cluster_file,sample_na
     if not os.path.exists(output_dirs):
         os.makedirs(output_dirs)
     ub=np.unique(ann.obs['batch'])
-
-  
-
-    
     alpha=0.5
     types="weighted_mean"
     R_dirs="/opt/miniforge3/bin/R"
-
-    
     CA=CoordAlignment(input_file=input_file,output_dirs=output_dirs,ub=ub,flags=flags,clust_cate=clust_cate,R_dirs=R_dirs,alpha=alpha,types=types)
-
-    
-
-    
     New_Coord=CA.New_Coord
     New_Coord.to_csv(output_dirs+"new_coord"+flags+"_modify.csv")
     ann.obsm['aligned_spatial']=New_Coord.loc[ann.obs_names,:].values
-    
     # Store the aligned coordinates into the orginal slices
-    
-    aligned_coords = ann.obsm['aligned_spatial'][:, :2]  
-
-    
-    
-    obs_names = ann.obs.index.to_numpy()  
- 
-
+    aligned_coords = ann.obsm['aligned_spatial'][:, :2]
+    obs_names = ann.obs.index.to_numpy()
     aligned_df = pd.DataFrame(aligned_coords, columns=['x_aligned', 'y_aligned'])
     aligned_df['obs_name'] = obs_names
-
-    
     print(aligned_df)
-
-    
-    aligned_df['obs_name'] = aligned_df['obs_name'].apply(lambda x: '-'.join(x.split('-')[1:]))
-
-
+    # aligned_df['obs_name'] = aligned_df['obs_name'].apply(lambda x: '-'.join(x.split('-')[1:]))
+    aligned_df['obs_name'] = aligned_df['obs_name'].apply(lambda x: '-'.join(x.split('-')[1:])).astype(str)
     slices = load_slices_h5ad(data_dir)
-        
     start_index = 0  
 
     for slice_data in slices:
         slice_data.obs.index.name = 'obs_name'
-        
         slice_size = len(slice_data.obs)
-        
         aligned_subset = aligned_df.iloc[start_index:start_index + slice_size].copy()
-        
         slice_data.obs.reset_index(inplace=True)
-        
         slice_data.obs = pd.merge(slice_data.obs, aligned_subset, on='obs_name', how='left')
-        
+        slice_data.obs['x_aligned'] = slice_data.obs['x_aligned'].astype(float)
+        slice_data.obs['y_aligned'] = slice_data.obs['y_aligned'].astype(float)
+        slice_data.obs['obs_name'] = slice_data.obs['obs_name'].astype(str)
         slice_data.obsm['spatial'] = slice_data.obs[['x_aligned', 'y_aligned']].values
-        
         start_index += slice_size
     return slices
 
-
-
-# %%
-def whole_process(data_dir,dirs,file_names,num_slices,n_category):
+def whole_process(data_dir,dirs,file_names,num_slices):
     dirs = './txt_file/'
-    params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,n_clust = process_1(data_dir,dirs,file_names,num_slices)
-    ann,embed_file,cluster_file = process_2(params,feat_file,edge_file,meta_file,coord_file,sample_name,flags,n_clust)
+    params,feat_file,edge_file,meta_file,coord_file,sample_name,flags = process_1(data_dir,dirs,file_names,num_slices)
+    ann,embed_file,cluster_file = process_2(params,feat_file,edge_file,meta_file,coord_file,sample_name,flags)
     print("DONE")
     slices_coordinated = coord_align(ann,flags,meta_file,coord_file,embed_file,cluster_file,sample_name,data_dir,file_names)
-    
-
     return slices_coordinated
 
-# %%
 def combine(data_dir, save_dir):
+    begin_time = time.time()
     dirs = './txt_file/'
     file_names = [f for f in os.listdir(data_dir) if os.path.isfile(os.path.join(data_dir, f))]
     num_slices = len(file_names)
     slices = load_slices_h5ad(data_dir)
-    
-    unique_layers = set()
-    for slice in slices:
-        unique_layers.update(slice.obs['Ground Truth'].unique())
-    n_category = len(unique_layers)
-    
-    slices_coordinated = whole_process(data_dir, dirs, file_names, num_slices, n_category)
-    
-  
-    os.makedirs(save_dir, exist_ok=True)
-    
-
-    save_subdir = os.path.join(save_dir, "spiral_aligned_slices")
-    os.makedirs(save_subdir, exist_ok=True)
-
-    for i, slice in enumerate(slices_coordinated):
-        save_path = os.path.join(save_subdir, f"aligned_slice_{i}.h5ad")
-        sc.write(save_path, slice)
-    
+    slices_coordinated = whole_process(data_dir,dirs,file_names,num_slices)
     return slices_coordinated
 
-# %%
 combine(args.data_dir,args.save_dir)
 
-
-#python spiral.py --data_dir ../../../../dataset/benchmark_dataset/cross\ integration/SCC/patient_2 --save_dir './aligned_slices'
