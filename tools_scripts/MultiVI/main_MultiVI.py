@@ -1,17 +1,16 @@
-import anndata
-import matplotlib.pyplot as plt
-import mudata as md
-import muon
-import scanpy as sc
+import os
 import scvi
-import pandas as pd
+import muon
 import h5py
+import random
+import anndata
+import argparse
 import numpy as np
+import mudata as md
+import scanpy as sc
+import pandas as pd
 from anndata import AnnData
 from scipy.sparse import csr_matrix
-import argparse
-import os
-import random
 from util import data_loader_multi_single, data_loader_multi_multi, split_dataset_by_modality, organize_multiome_datasets, sort_features_by_modality, filter_features, setup_anndata_for_multivi, get_normalized_expression, create_multivi_model, train_multivi_model, get_accessibility_estimates, save_multivi_model, load_multivi_model
 
 random.seed(1)
@@ -22,6 +21,10 @@ parser.add_argument('--pair_path1', metavar='DIR', default='NULL', help='path to
 parser.add_argument('--pair_path2', metavar='DIR', default='NULL', help='path to train pair data2')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
+
+# The MultiVI script for mosaic integration requires [RNA, RNA+ATAC, ADT]. The output is a joint embedding (dimensionality reduction).
+# run commond for MultiVI
+# python main_MultiVI.py --path1  "../../data/dataset_final/D45/rna1.h5" --path2 "../../data/dataset_final/D45/atac3.h5" --pair_path1 "../../data/dataset_final/D45/rna2.h5" --pair_path2 "../../data/dataset_final/D45/atac2.h5"  --save_path "../../result/embedding/mosaic integration/D45/MultiVI/"
 
 """# Module2 Creating, saving and loading the model"""
 
