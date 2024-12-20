@@ -6,23 +6,26 @@ import torch
 import random
 import anndata
 import argparse
-import scanpy as sc
 import numpy as np
 import pandas as pd
+import scanpy as sc
 from scipy.sparse import coo_matrix
+from sklearn.preprocessing import StandardScaler
+from scMVP.inference import MultiPosterior, MultiTrainer
+from sklearn.feature_extraction.text import TfidfTransformer
 from scMVP.dataset import LoadData,GeneExpressionDataset, CellMeasurement
 from scMVP.models import VAE_Attention, Multi_VAE_Attention, VAE_Peak_SelfAttention
-from scMVP.inference import MultiPosterior, MultiTrainer
-from sklearn.preprocessing import StandardScaler
-from sklearn.feature_extraction.text import TfidfTransformer
     
-torch.set_num_threads(40) # do not use all CPU threads
-random.seed(1)
+torch.set_num_threads(40)
 parser = argparse.ArgumentParser("scMVP")
-parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train data2')
+parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to RNA')
+parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to ATAC')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
+
+# The scMVP script for vertical integration requires RNA and ATAC data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for scMVP
+# python main_scMVP.py --path1 "../../data/dataset_final/D15/rna.h5" --path2 "../../data/dataset_final/D15/atac.h5" --save_path "../../result/embedding/vertical integration/D15/scMVP/"
 
 def run_MVP(rna_path, atac_path):
     with h5py.File(rna_path, "r") as f:
@@ -109,14 +112,10 @@ def run_MVP(rna_path, atac_path):
         frequency=5,
     )
     trainer.train(n_epochs=n_epochs, lr=lr)
-
     # create posterior from trained model
     full = trainer.create_posterior(trainer.model, dataset, indices=np.arange(len(dataset)),type_class=MultiPosterior)
     latent, latent_rna, latent_atac, cluster_gamma, cluster_index, batch_indices, labels = full.sequential().get_latent()
-
     return latent
-
-
 
 begin_time = time.time()
 result = run_MVP(args.path1, args.path2)
