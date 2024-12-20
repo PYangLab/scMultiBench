@@ -16,16 +16,18 @@ from scMSI.utils import read_txt, init_library_size
 from scMSI.utils import get_top_coeff, get_knn_Aff
 from scMSI.scMSI_main import SCMSIRNA, SCMSIProtein, SCMSIRNAProtein, SCMSICiteRna
 
-
-random.seed(1)
 parser = argparse.ArgumentParser("scMSI")
-parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train data2')
+parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train rna')
+parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train adt')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
 
-begin_time = time.time()
+# The scMSI script for vertical integration requires RNA and ADT data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for scMSI
+# vertical integration:
+# python main_scMSI.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/D3/"
 
+begin_time = time.time()
 def run_scMSI(adt_path,rna_path):
     with h5py.File(adt_path, 'r') as f:
         data_adt = np.array(f['matrix/data'])
@@ -35,6 +37,7 @@ def run_scMSI(adt_path,rna_path):
         data_rna = np.array(f['matrix/data'])
         barcodes_rna = np.array(f['matrix/barcodes'])
         features_rna = np.array(f['matrix/features'])
+
     RNA_data = sc.AnnData(X=data_rna.T, obs=pd.DataFrame(index=barcodes_rna), var=pd.DataFrame(index=features_rna))
     ADT_data = sc.AnnData(X=data_adt.T, obs=pd.DataFrame(index=barcodes_adt), var=pd.DataFrame(index=features_adt))
     gene_name = []
@@ -72,7 +75,7 @@ result = run_scMSI(args.path2,args.path1)
 end_time = time.time()
 all_time = end_time - begin_time
 result = np.transpose(result)
-
+print(result)
 # SAVE RESULT
 if not os.path.exists(args.save_path):
     os.makedirs(args.save_path)
@@ -83,3 +86,4 @@ file = h5py.File(args.save_path+"/embedding.h5", 'w')
 file.create_dataset('data', data=result)
 file.close()
 np.savetxt(args.save_path+"/time.csv", [all_time], delimiter=",")
+# SAVE RESULT
