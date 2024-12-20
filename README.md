@@ -82,7 +82,7 @@ Note that the installation time for tools can vary depending on the method used.
 All evaluation pipelines can be found within the [metrics](https://github.com/PYangLab/scMultiBench/tree/main/metrics) folder. Example datasets are stored in the 'example_data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'example_data/spatial/' folder. 
 
 ## Dataset
-The processed datasets can be downloaded from [link](https://www.dropbox.com/scl/fo/6lismnrtgt4jm4ogvdmx2/AAcw4oqSTNjoOGoTvPVZPVU?rlkey=izc0rghdcjc0tyv8hgt3a6yws&st=037efszp&dl=0)
+The processed datasets can be downloaded from [link](https://www.dropbox.com/scl/fo/6lismnrtgt4jm4ogvdmx2/AAcw4oqSTNjoOGoTvPVZPVU?rlkey=izc0rghdcjc0tyv8hgt3a6yws&st=037efszp&dl=0).
 
 ## License
 
