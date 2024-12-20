@@ -3,6 +3,10 @@ library(rliger)
 library(rhdf5)
 library(HDF5Array)
 
+# The script of iNMF for diagonal integration, [RNA, ATAC] data type, ATAC needs to be coverted into gene activity score. The output is joint embedding (dimension reduction)
+# run commond for iNMF
+# Rscript main_iNMF.Rmd  '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/atac_gas.h5' '../../result/embedding/diagonal integration/D27/iNMF/'
+
 h5_to_matrix <- function(path){
     h5_data <- h5read(path,"matrix") 
     feature <- h5_data$features
@@ -32,17 +36,18 @@ runLIGER<- function(path_list){
   data <- vector("list", length(path_list))
   for (i in c(1:(num-1))){
     temp <- h5_to_matrix(path_list[[i]])
-    colnames(temp) <- paste0(i, "_", 1:dim(temp)[2])
+    #colnames(temp) <- paste0(i, "_", 1:dim(temp)[2])
+    colnames(temp) <- paste0(i, "_", colnames(temp))
     data[[i]] <- temp
     names(data)[i] <- as.character(i)
   }
     
   pbmcs = createLiger(data)
   pbmcs = rliger::normalize(pbmcs)
-  pbmcs = selectGenes(pbmcs, datasets.use = 2)
+  pbmcs = selectGenes(pbmcs, datasets.use = 1)
   pbmcs = scaleNotCenter(pbmcs)
   
-  pbmcs <- optimizeALS(pbmcs,k=20)
+  pbmcs <- runIntegration(pbmcs, k = 20)
   pbmcs = quantile_norm(pbmcs)
   result <- pbmcs@H.norm
   return (result)
@@ -74,8 +79,3 @@ print(all_time)
 write.csv(rownames(result), paste0(save_path,"barcode.csv"))
 write_h5(exprs_list = list(rna = result), 
              h5file_list = c(paste0(save_path,"embedding.h5")))
-
-
-
-
-
