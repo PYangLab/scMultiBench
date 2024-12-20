@@ -1,6 +1,7 @@
-<h1>
-  <img src="figure/logo.png" alt="Logo" style="width:50px; vertical-align:middle;">
-  scMultiBench
+
+<h1 style="display: flex; align-items: center;">
+  <img src="figure/logo.png" alt="Logo" style="width:50px; margin-right:10px;">
+  <span>scMultiBench</span>
 </h1>
 
 Multi-task benchmarking of single-cell multimodal omics integration methods
