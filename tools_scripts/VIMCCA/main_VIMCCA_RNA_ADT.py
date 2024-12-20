@@ -8,12 +8,15 @@ from anndata import AnnData
 from scbean.model import vimcca
 from scipy.sparse import csr_matrix
 
-random.seed(1)
 parser = argparse.ArgumentParser("VIMCCA")
-parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train gene')
-parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train peak')
+parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to RNA')
+parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to ADT')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
+
+# The VIMCCA script for vertical integration requires RNA and ADT data as input. The output is a joint embedding (dimensionality reduction).
+# run commond for VIMCCA
+# python main_VIMCCA_RNA_ADT.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5" --save_path "../../result/embedding/diagonal integration/D3/VIMCCA/"
 
 def data_loader(path):
     with h5py.File(path, "r") as f:
