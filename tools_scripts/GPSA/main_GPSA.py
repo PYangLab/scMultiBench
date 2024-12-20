@@ -29,7 +29,7 @@ args = parser.parse_args()
 
 # The GPSA script for cross-integration requires spatial data in 'h5ad' format as input, including both gene expression data and spatial coordinates. The output is aligned coordinates (spatial registration).
 # run commond for GPSA
-# python GPSA.py --data_dir '../unified_data/DLPFC/donor1/' --save_dir './aligned_slices/'
+# python main_GPSA.py --data_dir '../unified_data/DLPFC/donor1/' --save_dir './aligned_slices/'
 
 # %%
 def load_slices_h5ad(data_dir):
