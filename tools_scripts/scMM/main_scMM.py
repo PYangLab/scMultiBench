@@ -72,7 +72,7 @@ args = parser.parse_args()
 # run commond for scMM (RNA+ATAC)
 # python main_scMM.py --path1 "../../data/dataset_final/D15/rna.h5" --path2 "../../data/dataset_final/D15/atac.h5"  --save_path "../../result/embedding/D15/" --model rna_atac
 # run commond for scMM (multiple RNA+ADT)
-# python main_scMM.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/scMM" rna_protein
+# python main_scMM.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/scMM" --model rna_protein
 # run commond for scMM (multiple RNA+ATAC)
 # python main_scMM.py --path1 "../../data/dataset_final/SD18/rna1.h5" "../../data/dataset_final/SD18/rna2.h5" --path2 "../../data/dataset_final/SD18/atac1.h5" "../../data/dataset_final/SD18/atac2.h5"  --save_path "../../result/embedding/cross integration/SD18/scMM/" --model rna_atac
 
