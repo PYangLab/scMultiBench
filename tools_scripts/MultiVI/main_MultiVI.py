@@ -15,10 +15,10 @@ from util import data_loader_multi_single, data_loader_multi_multi, split_datase
 
 random.seed(1)
 parser = argparse.ArgumentParser("MultiVI")
-parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to train data2')
-parser.add_argument('--pair_path1', metavar='DIR', default='NULL', help='path to train pair data1')
-parser.add_argument('--pair_path2', metavar='DIR', default='NULL', help='path to train pair data2')
+parser.add_argument('--path1', metavar='DIR', default='NULL', help='path to  RNA')
+parser.add_argument('--path2', metavar='DIR', default='NULL', help='path to  ATAC')
+parser.add_argument('--pair_path1', metavar='DIR', default='NULL', help='path to RNA of multiome')
+parser.add_argument('--pair_path2', metavar='DIR', default='NULL', help='path to ATAC of multiome')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
 
