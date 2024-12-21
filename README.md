@@ -14,7 +14,7 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 
 In this benchmark, we evaluated 40 integration methods across the four data integration categories on 64 real datasets and 22 simulated datasets on a Ubuntu system with  RTX3090 GPU. In particular, we include 18 vertical integration methods, 14 diagonal integration tools, 12 mosaic integration tools, and 15 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
 
-Vertical Integration:
+Vertical Integration (Dimension Reduction and Clustering):
 - [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
 - [sciPENN](https://github.com/jlakkis/sciPENN) v1.0.0
 - [Concerto](https://github.com/melobio/Concerto-reproducibility) Github Version: ab1fc7f
@@ -34,6 +34,11 @@ Vertical Integration:
 - [UnitedNet](https://github.com/LiuLab-Bioelectronics-Harvard/UnitedNet) Github Version: 3689da8
 - [scMVP](https://github.com/bm2-lab/scMVP) Github Version: fc61e4d
 
+Vertical Integration (Feature Selection):
+- [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
+- [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
+- [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
+  
 Diagonal Integration:
 - [scBridge](https://github.com/XLearning-SCU/scBridge) Github Version: ff17561
 - [Portal](https://github.com/YangLabHKUST/Portal) v1.0.2
