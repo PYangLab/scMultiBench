@@ -42,7 +42,7 @@ def load_atac(atac_peaks_path):
 
 def read_fs_label(label_path):
     label_fs = pd.read_csv(label_path,header=None,index_col=False)  #
-    label_fs = (label_fs.iloc[1:(label_fs.shape[0]),1])
+    label_fs = (label_fs.iloc[1:(label_fs.shape[0]),0])
     return label_fs
 
 
