@@ -20,9 +20,9 @@ args = parser.parse_args()
 
 # The scMoMaT script for vertical integration requires multi-modal count data as input. The output is a joint graph (dimensionality reduction).
 # example for vertical integration (RNA+ADT)
-# python main_scMoMaT.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5" --cty_path "../../data/dataset_final/D3/cty.csv"  --save_path "../../result/vertical integration/embedding/D3/scMoMaT/"
+# python main_scMoMaT_fs.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5" --cty_path "../../data/dataset_final/D3/cty.csv"  --save_path "../../result/vertical integration/embedding/D3/scMoMaT/"
 # example for vertical integration (RNA+ADT+ATAC)
-# python main_scMoMaT.py --path1 "../../data/dataset_final/D23/rna.h5" --path2 "../../data/dataset_final/D23/adt.h5" --path3 "../../data/dataset_final/D23/atac.h5" --cty_path "../../data/dataset_final/D23/cty.csv"  --save_path "../../result/vertical integration/embedding/D23/scMoMaT/"
+# python main_scMoMaT_fs.py --path1 "../../data/dataset_final/D23/rna.h5" --path2 "../../data/dataset_final/D23/adt.h5" --path3 "../../data/dataset_final/D23/atac.h5" --cty_path "../../data/dataset_final/D23/cty.csv"  --save_path "../../result/vertical integration/embedding/D23/scMoMaT/"
 
 
 begin_time = time.time()
