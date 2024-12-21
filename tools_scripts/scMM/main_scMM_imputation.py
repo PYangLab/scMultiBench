@@ -1,61 +1,32 @@
+import os
+import sys
+import h5py
+import time
+import torch
+import scipy
+import models
 import argparse
 import datetime
-import sys
-import json
-from collections import defaultdict
-from pathlib import Path
-from tempfile import mkdtemp
-
-import numpy as np
-import torch
-import torch.distributions as dist
-from torch.nn.utils import clip_grad_norm_
-from torch import optim
-from torch.utils.data import Subset, DataLoader
-from torchnet.dataset import TensorDataset, ResampleDataset
-
-import math
-import pandas as pd
-import scipy.sparse as sp
-from scipy.io import mmwrite, mmread
-from scipy.sparse import csr_matrix
-
-import models
 import objectives
-from utils import Logger, Timer, save_model, save_vars, unpack_data, EarlyStopping, Constants, log_mean_exp, is_multidata, kl_divergence
-#from datasets import RNA_Dataset, ATAC_Dataset
-
 import numpy as np
-import torch
-import torch.distributions as dist
-from torch.nn.utils import clip_grad_norm_
-from torch import optim
-from torch.utils.data import Subset, DataLoader
-from torchnet.dataset import TensorDataset, ResampleDataset
-
-import time 
-import os 
-import scipy
+import pandas as pd
 from glob import glob
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import MaxAbsScaler
+from torch import optim
+from pathlib import Path
+import scipy.sparse as sp
+from tempfile import mkdtemp
+import torch.distributions as dist
+from scipy.sparse import csr_matrix
+from collections import defaultdict
+from scipy.io import mmwrite, mmread
 from torch.utils.data import Dataset
-import h5py
+from sklearn.preprocessing import LabelEncoder
+from torch.utils.data import Subset, DataLoader
+from utils import Timer, save_vars, EarlyStopping
 
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset43/data1" --train_fids '1' --impute_fids '2' --save_path './dataset43' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset43/data1" --train_fids '1' --impute_fids '2' --save_path './dataset43' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 1 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
+# This script is designed for scMM mosaic integration (imputation). A paired multimodal dataset (RNA+ADT or RNA+ATAC) serves as the reference, while RNA, ADT, or ATAC is used as the query to predict the missing modality.
+# python main_scMM_imputation.py --data_path "../../data/dataset_final_imputation_hvg/D52/data1/" --train_fids '1' --impute_fids '2' --save_path './../../result/imputation_filter/D52/data1/scMM/' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path './data/BMNC' --learn_prior
 
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset44/data1" --train_fids '2' --impute_fids '3' --save_path './dataset44' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset45/data1" --train_fids '1' --impute_fids '2' --save_path './dataset45' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset46/data1" --train_fids '1' --impute_fids '2' --save_path './dataset46' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset47/data1" --train_fids '1' --impute_fids '2' --save_path './dataset47' --experiment 'rna_protein' --model 'rna_protein' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-
-
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset48/data1" --train_fids '1' --impute_fids '2' --save_path './dataset48' --experiment 'rna_atac' --model 'rna_atac' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-#python test.py --data_path "/home/sharonl/imputation_dataset/dataset49/data1" --train_fids '1' --impute_fids '2' --save_path './dataset49' --experiment 'rna_atac' --model 'rna_atac' --obj 'm_elbo_naive_warmup' --batch_size 32 --epochs 50 --deterministic_warmup 25 --lr 1e-4 --latent_dim 10 --num_hidden_layers 2 --r_hidden_dim 100 --p_hidden_dim 20 --dataset_path '../data/BMNC' --learn_prior
-
-#python wrapper.py --data_path './dataset47' --mod 'adt' --save_path './results/dataset47'
-#python wrapper.py --data_path './dataset49' --mod 'atac' --save_path './results/dataset49'
 
 class RNA_Dataset(Dataset):
     """
@@ -205,8 +176,6 @@ if args.model == 'rna_atac':
 elif args.model == 'rna_protein':
     modal = 'CITE-seq'
     model_fname = 'adt'
-
-
 
 
 for trainid in args.train_fids:

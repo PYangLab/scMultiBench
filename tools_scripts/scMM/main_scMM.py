@@ -76,6 +76,7 @@ args = parser.parse_args()
 # run commond for scMM (multiple RNA+ATAC)
 # python main_scMM.py --path1 "../../data/dataset_final/SD18/rna1.h5" "../../data/dataset_final/SD18/rna2.h5" --path2 "../../data/dataset_final/SD18/atac1.h5" "../../data/dataset_final/SD18/atac2.h5"  --save_path "../../result/embedding/cross integration/SD18/scMM/" --model rna_atac
 
+
 # random seed
 # https://pytorch.org/docs/stable/notes/randomness.html
 torch.backends.cudnn.benchmark = True
