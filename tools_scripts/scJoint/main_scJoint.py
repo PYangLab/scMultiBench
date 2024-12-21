@@ -48,7 +48,7 @@ args = parser.parse_args()
 
 # The scJoint script for diagonal integration requires RNA and ATAC data as input, also with the label of RNA and ATAC (optional), where ATAC needs to be transformed into gene activity score. The output is a joint embedding (dimensionality reduction).
 # run commond for scJoint
-# python main_scJoint.py --path1 "../../data/dataset_final/D27/rna.h5" --path2 "../../data/dataset_final/D27/atac_gas.h5" --cty_path1 "../../data/dataset_final/D27/rna_cty.csv" --cty_path2 "../../data/dataset_final/D27/atac_cty.csv" --save_path "../../result/embedding/diagonal integration/D27/scJoint/"
+# python main_scJoint.py --path1 "../../data/dataset_final/D27/rna.h5" --path2 "../../data/dataset_final/D27/atac_gas.h5" --cty_path1 "../../data/dataset_final/D27/rna_cty.csv"  --save_path "../../result/embedding/diagonal integration/D27/scJoint/"
 
 if not args.use_cuda:
     args.device = torch.device('cpu')

@@ -36,8 +36,8 @@ def label_parsing(rna_label_files, atac_label_files):
 
 			for line in lines:
 				line = line.split(',')
-				label = line[1].replace('\"', '').replace('\n', '')
-				#print(idx, label)
+				label = line[0].replace('\"', '').replace('\n', '')
+				#print(line[0],"!!$$#$")
 				total_rna_labels.append(label)
 	
 	# label to idx
@@ -60,7 +60,7 @@ def label_parsing(rna_label_files, atac_label_files):
 			with open(label_file.replace('csv','txt'), 'w') as rna_label_f:
 				for line in lines:
 					line = line.split(',')
-					label = line[1].replace('\"', '').replace('\n', '')
+					label = line[0].replace('\"', '').replace('\n', '')
 					rna_label_f.write(str(label_idx_mapping[label]) + '\n')
 					
 	# gen atac label files
@@ -72,7 +72,7 @@ def label_parsing(rna_label_files, atac_label_files):
 			with open(label_file.replace('csv','txt'), 'w') as rna_label_f:
 				for line in lines:
 					line = line.split(',')
-					label = line[1].replace('\"', '').replace('\n', '')
+					label = line[0].replace('\"', '').replace('\n', '')
 					if label in label_idx_mapping.keys():
 						rna_label_f.write(str(label_idx_mapping[label]) + '\n')
 					else:
