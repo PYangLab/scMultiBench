@@ -1,0 +1,46 @@
+```{r}
+compute_metrics <- function(groundtruth_path, query_path){
+    groundtruth <- as.factor(read.csv(groundtruth_path)$X0)
+    query_label <- as.factor(read.csv(query_path)$X0) 
+    common_levels <- union(levels(groundtruth), levels(query_label))
+    groundtruth <- factor(groundtruth, levels = common_levels)
+    query_label <- factor(query_label, levels = common_levels)
+    
+    cm <- table(groundtruth, query_label)
+
+    overall_accuracy <- sum(diag(cm)) / sum(cm)
+    average_accuracy <- mean(diag(prop.table(cm, 1)))
+    sensitivity <- diag(prop.table(cm, 1))  
+    specificity <- diag(prop.table(cm, 2))  
+    precision <- diag(prop.table(cm, 2))  
+    f1_score <- (2 * (precision * sensitivity) / (precision + sensitivity))
+    
+    sensitivity <- mean(sensitivity,na.rm = TRUE)
+    specificity <- mean(specificity,na.rm = TRUE)
+    f1_score <- mean(f1_score,na.rm = TRUE)
+    
+    print(paste("Overall Accuracy:", overall_accuracy))
+    print(paste("Average Accuracy:", average_accuracy))
+    print(paste("F1 Score:", f1_score))
+    print(paste("Sensitivity:", sensitivity))
+    print(paste("Specificity:", specificity))
+
+    result <- as.matrix(c(overall_accuracy, average_accuracy, specificity, sensitivity, f1_score))
+    rownames(result) <- c("Overall Accuracy", "Average Accuracy", "specificity", "sensitivity", "f1_score")
+    return(result)
+}
+```
+
+
+```{r}
+result <- "../../result/classification"
+query_file_path <- file.path(result, "query.csv")
+predict_file_path <- file.path(result, "predict.csv")
+result <- compute_metrics(query_file_path, predict_file_path)
+save_path <- "../../result/classification_metrics/"
+if (!dir.exists(save_path)) {
+    dir.create(save_path, recursive = TRUE)
+    print(paste("Created directory:", save_path))
+} 
+write.csv(result,  "classification_metric.csv")
+```
