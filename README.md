@@ -12,7 +12,7 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 
 ## Integration Tools
 
-In this benchmark, we evaluated 34 integration methods across the four data integration categories on 53 datasets on a Ubuntu system with 1 RTX3090 GPU. In particular, we include 17 vertical integration methods, 11 diagonal integration tools, 7 mosaic integration tools, and 14 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
+In this benchmark, we evaluated 40 integration methods across the four data integration categories on 64 real datasets and 22 simulated datasets on a Ubuntu system with  RTX3090 GPU. In particular, we include 18 vertical integration methods, 14 diagonal integration tools, 12 mosaic integration tools, and 15 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
 
 Vertical Integration:
 - [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
@@ -48,6 +48,7 @@ Diagonal Integration:
 - [online iNMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [scJoint](https://github.com/SydneyBioX/scJoint)  Github Version: cbbfa5d
 - [GLUE](https://github.com/tanlabcode/GLUER) Github Version: 192bb6e
+- [uniPort](https://uniport.readthedocs.io/en/latest/index.html) v1.2.2
 
 Mosaic Integration:
 - [MultiVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html) v1.1.2
@@ -87,7 +88,12 @@ Note that the installation time for tools can vary depending on the method used.
 All evaluation pipelines can be found within the [metrics](https://github.com/PYangLab/scMultiBench/tree/main/metrics) folder. Example datasets are stored in the 'example_data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'example_data/spatial/' folder. 
 
 ## Dataset
+
 The processed datasets can be downloaded from [link](https://www.dropbox.com/scl/fo/6lismnrtgt4jm4ogvdmx2/AAcw4oqSTNjoOGoTvPVZPVU?rlkey=izc0rghdcjc0tyv8hgt3a6yws&st=037efszp&dl=0).
+
+## Shiny
+
+Explore method performance in depth with our interactive Shiny app (http://), designed for dynamic visualization of benchmark results.
 
 ## License
 
