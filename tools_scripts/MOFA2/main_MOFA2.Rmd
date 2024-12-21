@@ -6,9 +6,9 @@ source("util.R")
 
 # The script of MOFA2 for vertical/cross integration for any matched multimodality data, such as RNA+ADT, RNA+ATAC, multiple RNA+ADT, multiple RNA+ATAC data types. The output is a joint embedding (dimension reduction)
 # run script command for 3 batches of 2 modality (RNA+ADT) data 
-# Rscript MOFA2.Rmd  './rna1.h5' './rna2.h5' './rna3.h5' './adt1.h5' './adt2.h5' './adt3.h5' 3 2 './MOFA2/'
+# Rscript main_MOFA2.Rmd  './rna1.h5' './rna2.h5' './rna3.h5' './adt1.h5' './adt2.h5' './adt3.h5' 3 2 './MOFA2/'
 # run script command for 1 batches of 3 modality (RNA+ADT+ATAC) data 
-# Rscript MOFA2.Rmd  './rna.h5' './adt.h5' './atac.h5' 1 3 './MOFA2/'
+# Rscript main_MOFA2.Rmd  './rna.h5' './adt.h5' './atac.h5' 1 3 './MOFA2/'
 
 # wrap the MOFA2 function
 run_MOFA2 <- function(processed_data,  plot=FALSE){
