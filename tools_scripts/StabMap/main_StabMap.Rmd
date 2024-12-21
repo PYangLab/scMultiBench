@@ -1,28 +1,47 @@
-library(StabMap)
+
+
 library(rhdf5)
 library(SingleCellExperiment)
 library(scran)
 library(Seurat)
+library(StabMap)
 library(HDF5Array)
 source("util.R")
 set.seed(2021)
 
-run_StabMap <- function(file_paths,save_path){
+# The script of stabmap for cross integration. The output is joint embedding (dimension reduction)
+# run commond for stabmap
+# source("main_StabMap.Rmd")
+# file_paths <- list(
+#  rna_path = list("../../../data/dataset_final/D52/rna1.h5",
+#               "../../../data/dataset_final/D52/rna2.h5", "../../../data/dataset_final/D52/rna3.h5"),
+#  adt_path = list("../../../data/dataset_final/D52/adt1.h5",
+#               "../../../data/dataset_final/D52/adt2.h5", "../../../data/dataset_final/D52/adt3.h5")
+#)
+#save_path <- "../../result/embedding/cross integration/D52/StabMap/"
+#reference <- "data3"
+#run_StabMap(file_paths,save_path, reference)
+#print("finish")
+
+
+run_StabMap <- function(file_paths,save_path, reference){
     begin_time <- Sys.time()
-    processed_data <- read_h5_data(file_paths$rna_path,file_paths$adt_path,file_paths$atac_path,(length(file_paths[[1]])))
+
+    processed_data <- read_h5_data(file_paths$rna_path,file_paths$adt_path,file_paths$atac_path)
+    if (!is.null(file_paths$rna_path)){processed_data$rna <- processed_data$rna[1:(length(file_paths$rna_path))]}
+    if (!is.null(file_paths$adt_path)){processed_data$adt <- processed_data$adt[1:(length(file_paths$adt_path))]}
+    if (!is.null(file_paths$atac_path)){processed_data$atac <- processed_data$atac[1:(length(file_paths$atac_path))]}
+    
+    if (!is.null(file_paths$rna_path)){file_paths$rna_path <- file_paths$rna_path[1:(length(file_paths$rna_path))]}
+    if (!is.null(file_paths$adt_path)){file_paths$adt_path <- file_paths$adt_path[1:(length(file_paths$adt_path))]}
+    if (!is.null(file_paths$atac_path)){file_paths$atac_path <- file_paths$atac_path[1:(length(file_paths$atac_path))]}
+
     stabmap_input <- stabmap_input_function(file_paths, processed_data)
     result = stabMap(stabmap_input,
-                   reference_list = c("data1"),
+                   reference_list = c(reference),
                    maxFeatures = Inf,
                    plot = FALSE)
-    
-    ######### data imputation after stabmap ###########
-    imp = imputeEmbedding(
-        stabmap_input, # original data list
-        result, # joint embedding
-        reference = colnames(stabmap_input[["data2"]]),
-        query = colnames(stabmap_input[["data1"]]))
-
+                   
     end_time <- Sys.time()
     all_time <- difftime(end_time, begin_time, units="secs")
 
@@ -32,12 +51,7 @@ run_StabMap <- function(file_paths,save_path){
      }
     write_h5(exprs_list = list(rna = result), 
                  h5file_list = c(paste0(save_path,"embedding.h5")))
-    #write_h5(exprs_list = list(rna = imp$data2[a,]), 
-    #             h5file_list = c(paste0(save_path,"imputated_adt_data1.h5")))
-    #write.csv(all_time, paste0(save_path,"time.csv"))
 }
-
-
 
 
 

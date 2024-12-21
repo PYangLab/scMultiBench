@@ -27,17 +27,19 @@ write_h5 <- function(exprs_list, h5file_list) {
 process_rna <- function(expr){
   sce <- SingleCellExperiment(list(counts=expr))
   sce <- logNormCounts(sce)
-  decomp <- modelGeneVar(sce)
-  hvgs <- rownames(decomp)[decomp$mean>0.01 & decomp$p.value <= 0.05]
-  return(list(logcounts = sce@assays@data$logcounts[hvgs,], counts = sce@assays@data$counts[hvgs,]))
+  #decomp <- modelGeneVar(sce)
+  #hvgs = getTopHVGs(decomp, n = 1000)
+  #hvgs <- rownames(decomp)[decomp$mean>0.01 & decomp$p.value <= 0.05]
+  return(list(logcounts = sce@assays@data$logcounts, counts = sce@assays@data$counts))
 }
 
 process_atac <- function(expr){
   sce <- SingleCellExperiment(list(counts=as.matrix(expr)))
   sce <- logNormCounts(sce)
   decomp <- modelGeneVar(sce)
-  hvgs <- rownames(decomp)[decomp$mean>0.25& decomp$p.value <= 0.05]
-  return(list(logcounts = sce@assays@data$logcounts[hvgs,], counts = sce@assays@data$counts[hvgs,]))
+  #hvgs <- rownames(decomp)[decomp$mean>0.25& decomp$p.value <= 0.05]
+  hvgs = getTopHVGs(decomp, n = 1000)
+  return(list(logcounts = sce@assays@data$logcounts, counts = sce@assays@data$counts))
 }
 
 process_adt <- function(expr){
