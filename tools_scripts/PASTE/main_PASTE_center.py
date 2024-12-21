@@ -13,13 +13,11 @@ import paste as pst
 parser = argparse.ArgumentParser('PASTE_centre')
 parser.add_argument('--data_dir', default='../unified_data/SCC/patient_2/', help='path to the data directory')
 parser.add_argument('--save_dir', default='./aligned_slices/', help='path to save the output data')
-parser.add_argument('--number', type=int, required=True, help='Number prefix for filenames')
 args = parser.parse_args()
 
 # The PASTE_centre script for cross-integration requires spatial data in 'h5ad' format as input, including both gene expression data and spatial coordinates. The output is aligned coordinates (spatial registration).
 # run commond for PASTE_centre
 # python main_PASTE_centre.py --data_dir '../../data/dataset_final/D60/processed/patient_2/' --save_dir '../../result/registration/D60/PASTE_centre/patient_2'
-
 
 backend = ot.backend.TorchBackend()
 def load_slices_h5ad_scc(data_dir):
