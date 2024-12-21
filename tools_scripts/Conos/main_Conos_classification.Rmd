@@ -1,0 +1,147 @@
+
+library(conos)
+library(pagoda2)
+library(parallel)
+library(ggplot2)
+library(rhdf5)
+library(glue)
+library(HDF5Array)
+
+# The script of Conos for diagonal integration (classification)
+# run commond for Conos
+# Rscript main_Conos_classification.Rmd  '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/atac_gas.h5' '../../data/dataset_final/D27/rna_cty.csv' '../../data/dataset_final/D27/atac_cty.csv'  '../../result/classification/D27/Conos_own/'
+
+h5_to_matrix <- function(path){
+    h5_data <- h5read(path,"matrix") 
+    feature <- h5_data$features
+    barcode <- h5_data$barcodes
+    data <- t(h5_data$data)
+    colnames(data) <- as.character(barcode)
+    rownames(data) <- as.character(feature)
+    return (data)
+}
+
+h5_to_matrix2 <- function(path){
+    h5_data <- h5read(path,"data") 
+    data <- (h5_data)
+    colnames(data) <- as.character(c(1:dim(data)[2]))
+    rownames(data) <- as.character(c(1:dim(data)[1]))
+    return (data)
+}
+
+write_h5 <- function(exprs_list, h5file_list) {
+  if (length(unique(lapply(exprs_list, rownames))) != 1) {
+    stop("rownames of exprs_list are not identical.")
+  }
+  for (i in seq_along(exprs_list)) {
+    if (file.exists(h5file_list[i])) {
+      warning("h5file exists! will rewrite it.")
+      system(paste("rm", h5file_list[i]))
+    }
+    h5createFile(h5file_list[i])
+    writeHDF5Array(((exprs_list[[i]])), h5file_list[i], name = "data")
+    print(h5ls(h5file_list[i]))
+  }
+}
+
+
+runConos<- function(path_list, path_cty_list, save_path){
+  print("!!!")
+  print(path_list)
+  print(path_cty_list)
+  data <- vector("list", length(path_list))
+  for (i in c(1:((num-1)/2))){
+    temp <- h5_to_matrix(path_list[[i]])
+    colnames(temp) <- paste0(i, "_", 1:dim(temp)[2])
+    data[[i]] <- temp
+    names(data)[i] <- as.character(i)
+  }
+  
+
+  p2l <- lapply(data,basicP2proc,n.cores=1,n.odgenes=3e3,make.geneknn=FALSE,nPcs=30) #,min.transcripts.per.cell = 0，min.cells.per.gene=0,
+  con <- Conos$new(p2l, n.cores=1)
+  con$buildGraph(k=15, k.self=5, k.self.weigh=0.01, ncomps=30, n.odgenes=5e3, space='PCA') 
+  con$findCommunities(resolution=1.5)
+  con$embedGraph(alpha=1/2) 
+  # write.csv(c(con$graph)[[9]][[3]]$name, c(paste0(save_path,"barcode.csv")))
+  
+  #metadata <- data.frame(Cluster=con$clusters$leiden$groups)
+  #hdf5file = "result.h5"
+  #saveConosForScanPy(con, output.path=save_path, hdf5_filename=hdf5file, verbose=TRUE)
+  
+  embedding = con$embeddings$largeVis
+  
+  
+  cty <- vector("list", length(path_cty_list))
+  for (i in c(1:((num-1)/2))){
+    print(path_cty_list[[i]])
+    temp <- read.csv(path_cty_list[[i]])$x
+    names(temp) <- paste0(i, "_", 1:length(temp))
+    cty[[i]] <- temp
+    names(cty)[i] <- as.character(i)
+  }
+  all_labels <- list()
+
+  for (i in seq_along(cty)) {
+    new.label.info <- con$propagateLabels(labels = cty[[i]], verbose=TRUE)
+    numeric_part <- as.numeric(sub("^\\d+_(\\d+)$", "\\1", names(new.label.info$labels)))
+    group_part <- as.numeric(sub("^(\\d+)_\\d+$", "\\1", names(new.label.info$labels)))
+    sorted_indices <- order(group_part, numeric_part)
+    sorted_labels <- new.label.info$labels[sorted_indices]
+    all_labels[[i]] <- sorted_labels #new.label.info$labels
+  }
+
+  n <- 0 
+  for (i in seq_along(cty)) {
+    query_batches_labels <- unlist(cty[-i])
+
+    other_batches_labels <- all_labels[i][[1]]
+    other_batches_labels <- other_batches_labels[!grepl(paste0("^", i, "_"), names(other_batches_labels))]
+    n <- n + 1
+    if (!dir.exists(paste0(save_path, glue("/r{n}")))) {
+      dir.create(paste0(save_path, glue("/r{n}")), recursive = TRUE)
+      print("path create")
+    }
+    print("accuracy:~!!")
+    print(sum(query_batches_labels==other_batches_labels)/length(other_batches_labels))
+
+    write.csv(query_batches_labels, paste0(save_path, glue("/r{n}/query.csv")))  
+    write.csv(other_batches_labels, paste0(save_path, glue("/r{n}/predict.csv")))  
+  }
+
+
+  #embedding <- t(embedding)
+  #write_h5(exprs_list = list(rna = embedding), 
+  #           h5file_list = c(paste0(save_path,"embedding.h5")))
+  return (embedding)
+}
+
+# load data, the input is RNA counts and ATAC gene activity score counts
+args <- commandArgs(trailingOnly = TRUE)
+num <- length(args)
+path_list <- vector("list", (num-1)/2)
+for (i in c(1:((num-1)/2))){
+  print(i)
+  path_list[[i]] <- args[i]
+}
+
+path_cty_list <- vector("list", (num-1)/2)
+index = 1
+for (i in c(((num-1)/2+1):((num-1)))){
+  path_cty_list[[index]] <- args[i]
+  index = index + 1
+}
+print(path_cty_list)
+save_path <- args[num] 
+print(path_list)
+
+if (!dir.exists(save_path)) {
+  dir.create(save_path, recursive = TRUE)
+  print("path create")
+}
+
+# run method
+begin_time <- Sys.time()
+result <- runConos(path_list,path_cty_list, save_path)
+end_time <- Sys.time()
+all_time <- difftime(end_time, begin_time, units="secs")
