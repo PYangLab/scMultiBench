@@ -85,7 +85,7 @@ adata_integrated.obs["batch"] = batch
 adata_integrated.obs["batch"] = adata_integrated.obs['batch'].astype(str).astype('category')
 
 clisi = scib.me.clisi_graph(adata_integrated, label_key="celltype", type_="embed", use_rep="X_emb")
-print("clisi:", clisi)
+print("cLISI:", clisi)
 
 ari = scib.me.ari(adata_integrated, cluster_key="cluster", label_key="celltype")
 print("ARI_cellType:", ari)
