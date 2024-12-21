@@ -36,8 +36,8 @@ def sinfonia_process(data_path,cty_path,save_dir):
     adata = h5_to_anndata(data_path, cty_path)
     print(adata.obs['label'])
     sc.pp.neighbors(adata)
-    adata = sinfonia.get_N_clusters(adata, n_cluster=adata.obs['label'].nunique(), cluster_method='louvain')
-    adata.obs['cluster_louvain'] = adata.obs['louvain']
+    adata = sinfonia.get_N_clusters(adata, n_cluster=adata.obs['label'].nunique(), cluster_method='leiden')
+    adata.obs['cluster_leiden'] = adata.obs['leiden']
     save_path = os.path.dirname(save_dir)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
