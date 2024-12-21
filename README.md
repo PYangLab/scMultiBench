@@ -87,12 +87,12 @@ Cross Integration (Dimension Reduction, Batch Correction, Clustering, Classifica
 - [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
 
 Cross Integration (Spatial Registration):
-- [PASTE](https://github.com/raphael-group/paste) v1.4.0
+- [PASTE] (both pairwise and centre versions)(https://github.com/raphael-group/paste) v1.4.0
 - [PASTE2](https://github.com/raphael-group/paste2) Gihub Version: a419f02 
 - [SPIRAL](https://github.com/guott15/SPIRAL/tree/main) v1.0
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
   
-Note that the installation time for tools may vary depending on the method used. For more detailed information, please refer to the original publication. For built-in classification, the classification scripts are provided in their corresponding method folders within the tools_scripts directory. For additional modules (such as kNN, SVM, random forest, and MLP), the scripts are provided in the [classification] directory.
+Note that the installation time for tools may vary depending on the method used. For more detailed information, please refer to the original publication. For built-in classification, the classification scripts are provided in their corresponding method folders within the [tools_scripts] directory. For additional modules (such as kNN, SVM, random forest, and MLP), the scripts are provided in the [classification] directory.
 
 ## Evaluation Pipeline
 
