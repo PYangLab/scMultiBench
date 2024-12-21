@@ -22,6 +22,7 @@ parser.add_argument('--index', type=int, default=1, help='batch size')
 args = parser.parse_args()
 
 # The UnitedNet script is designed for vertical integration of RNA and ATAC data, as well as cross-integration of multiple RNA and ATAC datasets. This is a supervised method and requires labels.
+# The output is a joint embedding (dimension reduction) and predicted labels (classification)
 # the commond for unitednet (RNA+ATAC)
 # python main_UnitedNet.py --train_path1 "./rna1.h5"  --train_path2 "./atac1.h5"   --train_cty_path "./cty1.csv" --test_path1 "./rna.h5"   --test_path2 "./atac.h5" --save_path "./UnitedNet"
 # the commond for unitednet (multiple RNA+ATAC)
