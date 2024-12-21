@@ -39,7 +39,7 @@ Vertical Integration (Feature Selection):
 - [Matilda](https://github.com/PYangLab/Matilda) Github Version: 7d71480
 - [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
   
-Diagonal Integration:
+Diagonal Integration (Dimension Reduction, Batch Correction, Clustering, Classification):
 - [scBridge](https://github.com/XLearning-SCU/scBridge) Github Version: ff17561
 - [Portal](https://github.com/YangLabHKUST/Portal) v1.0.2
 - [SCALEX](https://github.com/jsxlei/SCALEX) v1.0.2
@@ -55,7 +55,7 @@ Diagonal Integration:
 - [GLUE](https://github.com/tanlabcode/GLUER) Github Version: 192bb6e
 - [uniPort](https://uniport.readthedocs.io/en/latest/index.html) v1.2.2
 
-Mosaic Integration:
+Mosaic Integration (Dimension Reduction, Batch Correction, Clustering, Classification):
 - [MultiVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html) v1.1.2
 - [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
 - [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8
@@ -63,13 +63,17 @@ Mosaic Integration:
 - [UINMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
 - [SMILE](https://github.com/rpmccordlab/SMILE) Github Version: a2e2ca6
-- [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
-- [sciPENN](https://github.com/jlakkis/sciPENN) v1.0.0
+
+Mosaic Integration (Imputation):
 - [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
 - [moETM](https://github.com/manqizhou/moETM) Github Version: ad89fe2
 - [UnitedNet](https://github.com/LiuLab-Bioelectronics-Harvard/UnitedNet) Github Version: 3689da8
-    
-Cross Integration:
+- [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
+- [sciPENN](https://github.com/jlakkis/sciPENN) v1.0.0
+- [StabMap](https://github.com/MarioniLab/StabMap) v0.1.8
+- [MultiVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html) v1.1.2
+  
+Cross Integration (Dimension Reduction, Batch Correction, Clustering, Classification):
 - [totalVI](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html) v1.1.2
 - [scMoMaT](https://github.com/PeterZZQ/scMoMaT) v0.2.2
 - [UnitedNet](https://github.com/LiuLab-Bioelectronics-Harvard/UnitedNet) Github Version: 3689da8
@@ -81,11 +85,13 @@ Cross Integration:
 - [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
 - [MOFA+](https://biofam.github.io/MOFA2/) v1.6.0
 - [Multigrate](https://multigrate.readthedocs.io/en/latest/index.html) v0.0.2
+
+Cross Integration (Spatial Registration):
 - [PASTE](https://github.com/raphael-group/paste) v1.4.0
 - [PASTE2](https://github.com/raphael-group/paste2) Gihub Version: a419f02 
 - [SPIRAL](https://github.com/guott15/SPIRAL/tree/main) v1.0
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
-
+  
 Note that the installation time for tools can vary depending on the method used. For more detailed information, refer to the original publication.
 
 ## Evaluation Pipeline
