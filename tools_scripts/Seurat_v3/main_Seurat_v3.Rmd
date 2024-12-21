@@ -45,7 +45,7 @@ runSeurat<- function(rna_path, atac_path, gene.activities_path, rna_cty_path, at
   rna_cty <- read.csv(rna_cty_path)$x
   rna_seurat$annotation <- rna_cty
   print(rownames(atac)[1:10])
-  atac_seurat <-CreateChromatinAssay(counts = atac, sep = c("-", "-")) 
+  atac_seurat <-CreateChromatinAssay(counts = atac, sep = c(":", "-")) 
   atac_seurat  <- CreateSeuratObject(counts = atac_seurat, assay = 'ATAC') 
 
   rna_seurat <- NormalizeData(rna_seurat)
