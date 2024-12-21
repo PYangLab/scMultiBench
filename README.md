@@ -92,7 +92,7 @@ Cross Integration (Spatial Registration):
 - [SPIRAL](https://github.com/guott15/SPIRAL/tree/main) v1.0
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
   
-Note that the installation time for tools can vary depending on the method used. For more detailed information, refer to the original publication.
+Note that the installation time for tools may vary depending on the method used. For more detailed information, please refer to the original publication. For built-in classification, the classification scripts are provided in their corresponding method folders within the tools_scripts directory. For additional modules (such as kNN, SVM, random forest, and MLP), the scripts are provided in the [classification] directory.
 
 ## Evaluation Pipeline
 
