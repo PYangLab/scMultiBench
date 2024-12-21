@@ -16,9 +16,13 @@ parser.add_argument('--dataset_dir', default='../test_bench/cross/dataset51/', h
 parser.add_argument('--save_dir', default='./processed_data/', help='path to save the output data')
 parser.add_argument('--holdout_batch', default='batch2', help='holdout batch for imputation')
 parser.add_argument('--transform_batch',default = 'batch1', help= 'imputation reference')
+parser.add_argument('--seed',  type=int,  default=0, help='path to save the output data')
 args = parser.parse_args()
 
 # %%
+#python main_totalVI_imputation.py --dataset_dir "../../data/dataset_final_imputation_hvg/D55/data2/reference/" --save_dir "../../result/imputation/D55/data2/totalVI" --holdout_batch 'batch2' --transform_batch 'batch1'
+#python main_totalVI_imputation.py --dataset_dir "../../data/dataset_final_imputation_hvg/D55/data1/reference/" --save_dir "../../result/imputation/D55/data1/totalVI" --holdout_batch 'batch2' --transform_batch 'batch1'
+
 def load_data_with_batch_and_label(adt_path, rna_path, cty_path, batch_name, adt_features=None):
     with h5py.File(rna_path, 'r') as f:
         data_rna = np.array(f['matrix/data']).T
@@ -31,7 +35,7 @@ def load_data_with_batch_and_label(adt_path, rna_path, cty_path, batch_name, adt
         data_adt = np.zeros((len(barcodes_rna), adt_features))
 
     cty_df = pd.read_csv(cty_path, skiprows=1, header=None)
-    cell_types = cty_df.iloc[:, 1].values
+    cell_types = cty_df.iloc[:, 0].values
 
     adata = sc.AnnData(X=data_rna, obs=pd.DataFrame(index=barcodes_rna))
     adata.obs['batch'] = batch_name
@@ -101,7 +105,7 @@ def load_files(dataset_dir):
     return adata,batch
 
 # %%
-scvi.settings.seed = 0
+scvi.settings.seed = args.seed
 print("Last run with scvi-tools version:", scvi.__version__)
 
 sns.set_theme()
@@ -129,7 +133,7 @@ scvi.model.TOTALVI.setup_anndata(
     adata, batch_key="batch", protein_expression_obsm_key="protein_expression"
 )
 model = scvi.model.TOTALVI(adata, empirical_protein_background_prior=False, latent_distribution="normal", n_layers_decoder=2)
-model.train()
+model.train(batch_size=265)#
 
 embedding = model.get_latent_representation()
 
@@ -140,18 +144,15 @@ rna, protein = model.get_normalized_expression(
 adata.obsm['protein_expression'] = protein.to_numpy()
 data_imputed = protein[batch ==holdout_batch]
 
-save_dir = './processed_data/'
+save_dir = args.save_dir #'./processed_data/'
 os.makedirs(save_dir, exist_ok=True)
 
-imputed_data_filename = "imputed_data.h5"
+imputed_data_filename = "imputation.h5"
 imputed_data_path = os.path.join(save_dir, imputed_data_filename)
 with h5py.File(imputed_data_path, 'w') as file:
     if held_out_proteins is not None:
         file.create_dataset("data", data=data_imputed)
-embedding_data_filename = "embeddings.h5"
-embeddings_path = os.path.join(save_dir, embedding_data_filename)
-with h5py.File(embeddings_path, 'w') as file:
-    file.create_dataset("data", data=embedding)
+
 
 
 
