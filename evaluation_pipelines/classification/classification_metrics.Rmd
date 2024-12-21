@@ -33,7 +33,7 @@ compute_metrics <- function(groundtruth_path, query_path){
 
 
 ```{r}
-result <- "../../result/classification"
+result <- "../../data/classification/demo_result/"
 query_file_path <- file.path(result, "query.csv")
 predict_file_path <- file.path(result, "predict.csv")
 result <- compute_metrics(query_file_path, predict_file_path)
