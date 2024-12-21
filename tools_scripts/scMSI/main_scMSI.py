@@ -63,7 +63,7 @@ def run_scMSI(adt_path,rna_path):
       latent_distribution="normal",
     )
     max_epochs = 400
-    model.train(max_epochs=max_epochs, record_loss=True)
+    model.train(max_epochs=max_epochs, record_loss=True, batch_size=128) # may change the batch_size if there is nan error
     rna_latent, pro_latent = model.get_latent_representation(batch_size=128)
     adata.obsm["rna_latent"] = rna_latent
     adata.obsm["pro_latent"] = pro_latent
