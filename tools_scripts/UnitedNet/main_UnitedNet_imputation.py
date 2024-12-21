@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import h5py
+import torch
 import random
 import anndata
 import argparse
@@ -12,15 +13,22 @@ from anndata import AnnData
 from src.interface import UnitedNet
 from src.configs import *
 
-
-random.seed(1)
 parser = argparse.ArgumentParser("UnitedNet")
-
 parser.add_argument('--data_path', default='NULL', help='path to load the data')
 parser.add_argument('--train_fids', metavar='trainid', nargs='+', default=[], help='file ids to train data1')
 parser.add_argument('--impute_fids', metavar='imputeid', default='1', help='file ids to train data2')
 parser.add_argument('--save_path', default='NULL', help='path to save the output data')
+parser.add_argument('--seed',  type=int,  default=1, help='path to save the output data')
 args = parser.parse_args()
+
+# This script is designed for UnitedNet cross-integration (imputation).
+#python main_UnitedNet_imputation.py --data_path "../../data/dataset_final_imputation_hvg/D56/data1" --train_fids '1' --impute_fids '2' --save_path "../../result/imputation_filter/D56/data1/UnitedNet"
+#python main_UnitedNet_imputation.py --data_path "../../data/dataset_final_imputation_hvg/D56/data2" --train_fids '1' --impute_fids '2' --save_path "../../result/imputation_filter/D56/data2/UnitedNet"
+
+
+random.seed(args.seed)
+np.random.seed(args.seed)
+torch.manual_seed(args.seed)
 device = "cuda:0"
 
 def data_loader(path, bid):
@@ -53,7 +61,7 @@ unique_batches = []
 for trainid in args.train_fids:
 	unique_batches.append('T'+trainid)
 	rna_h5 = os.path.join(args.data_path, 'reference', 'rna'+trainid+'.h5')
-	adt_h5 = os.path.join(args.data_path, 'reference', 'peak'+trainid+'.h5')
+	adt_h5 = os.path.join(args.data_path, 'reference', 'atac'+trainid+'.h5')
 	lb_csv = os.path.join(args.data_path, 'reference', 'cty'+trainid+'.csv')
 	lbs = pd.read_csv(lb_csv)['x'].tolist()
 	print("->Loading "+rna_h5)
@@ -69,7 +77,7 @@ for trainid in args.train_fids:
 print("----preparing testing data..")
 unique_batches.append('I'+args.impute_fids)
 rna_test_h5 = os.path.join(args.data_path, 'reference', 'rna'+args.impute_fids+'.h5')
-adt_test_h5 = os.path.join(args.data_path, 'gt', 'peak'+args.impute_fids+'.h5')
+adt_test_h5 = os.path.join(args.data_path, 'gt', 'atac'+args.impute_fids+'.h5')
 lb_test_csv = os.path.join(args.data_path, 'reference', 'cty'+args.impute_fids+'.csv')
 lbs_test = pd.read_csv(lb_test_csv)['x'].tolist()
 print("->Loading "+rna_test_h5)
@@ -209,15 +217,24 @@ end_time = time.time()
 all_time = end_time - begin_time
 print(all_time)
 print(len(adatas_prd))
-
+if not os.path.exists(args.save_path):
+    os.makedirs(args.save_path)
+    print("create path")
+else:
+    print("the path exits")
+    
 print("---Saving data")
 file = h5py.File(args.save_path+"/imputed_result_atac.h5",'w')
-file.create_dataset("prediction", data=adatas_prd[0][1])
-file.create_dataset("within_prediction", data=adatas_prd[0][0])
-file.create_dataset("groundtruth_raw", data=adatas_test[0].X)
+file.create_dataset("data", data=adatas_prd[0][1])
+file = h5py.File(args.save_path+"/within_prediction_atac.h5",'w')
+file.create_dataset("data", data=adatas_prd[0][0])
+file = h5py.File(args.save_path+"/groundtruth_raw_atac.h5",'w')
+file.create_dataset("data", data=adatas_test[0].X)
 
 file1 = h5py.File(args.save_path+"/imputed_result_rna.h5",'w')
-file1.create_dataset("prediction", data=adatas_prd[1][0])
-file1.create_dataset("within_prediction", data=adatas_prd[1][1])
-file1.create_dataset("groundtruth_raw", data=adatas_test[1].X)
+file1.create_dataset("data", data=adatas_prd[1][0])
+file1 = h5py.File(args.save_path+"/within_prediction_rna.h5",'w')
+file1.create_dataset("data", data=adatas_prd[1][1])
+file1 = h5py.File(args.save_path+"/groundtruth_raw_rna.h5",'w')
+file1.create_dataset("data", data=adatas_test[1].X)
 
