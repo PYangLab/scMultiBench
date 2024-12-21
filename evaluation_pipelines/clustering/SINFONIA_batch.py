@@ -16,7 +16,7 @@ parser.add_argument('--save_path', metavar='DIR', type=str, required=True, help=
 parser.add_argument('--num',  type=int,  default=1, help='path to save the output data')
 args = parser.parse_args()
 
-# python SINFONIA_batch.py --path1 "../../data/dr&bc/embedding.h5" --num 3 --save_path "./sinfonia_clustering_batch.h5"
+# python SINFONIA_batch.py --path1 "../../data/dr&bc/embedding/embedding.h5" --num 3 --save_path "./../../data/clustering/embedding/sinfonia_clustering_batch.h5"
 
 def h5_to_anndata(data_path):
     with h5py.File(data_path, 'r') as f:

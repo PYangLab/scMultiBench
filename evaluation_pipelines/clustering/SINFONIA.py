@@ -16,7 +16,7 @@ parser.add_argument('--cty_path', metavar='DIR', nargs='+', default=[], help='Pa
 parser.add_argument('--save_path', metavar='DIR', type=str, required=True, help='Path to save the output h5 file')
 args = parser.parse_args()
 
-# python SINFONIA.py --path1 "../../data/dr&bc/embedding.h5" --cty_path "../../data/dr&bc/cty1.csv" "../../data/dr&bc/cty2.csv" "../../data/dr&bc/cty3.csv" --save_path "./sinfonia_clustering.h5"
+# python SINFONIA.py --path1 "../../data/dr&bc/embedding/embedding.h5" --cty_path "../../data/dr&bc/embedding/cty1.csv" "../../data/dr&bc/embedding/cty2.csv" "../../data/dr&bc/embedding/cty3.csv" --save_path "./../../data/clustering/embedding/sinfonia_clustering.h5"
 
 def h5_to_anndata(data_path, cty_path):
     with h5py.File(data_path, 'r') as f:
