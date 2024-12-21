@@ -13,7 +13,7 @@ def read_fs_label(label_paths):
     all_label = []
     for label_path in label_paths:
         label_fs = pd.read_csv(label_path,header=None,index_col=False)  #
-        label_fs = label_fs.iloc[1:(label_fs.shape[0]),1]
+        label_fs = label_fs.iloc[1:(label_fs.shape[0]),0]
         label_fs = pd.Categorical(label_fs).codes
         label_fs = np.array(label_fs[:]).astype('int32')
         label_fs = torch.from_numpy(label_fs)

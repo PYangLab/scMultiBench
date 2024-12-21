@@ -18,19 +18,15 @@ parser.add_argument('--cty_path', metavar='DIR', nargs='+', default=[], help='pa
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
 
-# The scMoMaT script for vertical/mosaic/cross integration requires multi-batch multi-modal data with bridge modality as input. The output is a joint graph (dimensionality reduction).
+# The scMoMaT script for vertical integration requires multi-modal count data as input. The output is a joint graph (dimensionality reduction).
 # example for vertical integration (RNA+ADT)
-# python main_scMoMaT.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/vertical integration/embedding/D3/scMoMaT/"
+# python main_scMoMaT.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5" --cty_path "../../data/dataset_final/D3/cty.csv"  --save_path "../../result/vertical integration/embedding/D3/scMoMaT/"
 # example for vertical integration (RNA+ADT+ATAC)
-# python main_scMoMaT.py --path1 "../../data/dataset_final/D23/rna.h5" --path2 "../../data/dataset_final/D23/adt.h5" --path3 "../../data/dataset_final/D23/atac.h5"  --save_path "../../result/vertical integration/embedding/D23/scMoMaT/"
-# example for cross integration (multiple RNA+ADT)
-# python main_scMoMaT.py --path1 "../../data/dataset_final/D51/rna1.h5" "../../data/dataset_final/D51/rna2.h5" --path2 "../../data/dataset_final/D51/adt1.h5"  "../../data/dataset_final/D51/adt2.h5" --save_path "../../result/embedding/cross integration/D51/scMoMaT"
-# example for mosaic integration ([RNA, RNA+ADT, ADT])
-# python main_scMoMaT.py --path1 "../../data/dataset_final/D38/rna1.h5" "../../data/dataset_final/D38/rna2.h5"  None --path2  None "../../data/dataset_final/D38/adt2.h5" "../../data/dataset_final/D38/adt3.h5"  --path3 None None None --save_path "../../result/embedding/mosaic integration/D38/scMoMaT/"
+# python main_scMoMaT.py --path1 "../../data/dataset_final/D23/rna.h5" --path2 "../../data/dataset_final/D23/adt.h5" --path3 "../../data/dataset_final/D23/atac.h5" --cty_path "../../data/dataset_final/D23/cty.csv"  --save_path "../../result/vertical integration/embedding/D23/scMoMaT/"
 
 
 begin_time = time.time()
-def run_scMoMaT(file_paths):
+def run_scMoMaT(file_paths, cty_path):
     processed_data,feature_num = read_h5_data(file_paths["rna_path"], file_paths["adt_path"], file_paths["atac_path"], len(file_paths["rna_path"]))
     counts_rnas = processed_data['rna']
     counts_adts = processed_data['adt']
@@ -76,7 +72,6 @@ def run_scMoMaT(file_paths):
     lr = 1e-2
     seed = 0
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
     # run and get embedding
     model = scmomat.scmomat_model(counts = counts, K = K, batch_size = batch_size, interval = interval, lr = lr, lamb = lamb, seed = seed, device = device)
     losses = model.train_func(T = T)
@@ -90,12 +85,49 @@ def run_scMoMaT(file_paths):
     umap_embedding = scmomat.calc_umap_embedding(knn_indices = knn_indices, knn_dists = knn_dists, n_components = 2, n_neighbors = n_neighbors, min_dist = 0.20, random_state = 0)
 
     # run and get feature importance score
-    #labels_real = read_fs_label(args.cty_path)
-    #T = 2000
-    #model2 = scmomat.scmomat_retrain(model = model, counts =  counts, labels = labels_real, lamb = lamb, device = device)
-    #losses = model2.train(T = T)
-    #marker_score = model2.extract_marker_scores()
-    return knn_indices, knn_dists, umap_embedding#, marker_score
+    labels_real = read_fs_label(cty_path)
+    T = 2000
+    model2 = scmomat.scmomat_retrain(model = model, counts =  counts, labels = labels_real, lamb = lamb, device = device)
+    losses = model2.train(T = T)
+    marker_score = model2.extract_marker_scores()
+    
+    if not os.path.exists(args.save_path):
+        os.makedirs(args.save_path)
+        print("create path")
+    else:
+        print("the path exits")
+    if not rna_none and not adt_none and atac_none:
+        file = h5py.File(args.save_path+"/marker_score_rna.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['rna']))
+        file.close()
+        file = h5py.File(args.save_path+"/marker_score_adt.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['adt']))
+        file.close()
+    elif not rna_none and adt_none and not atac_none:
+        file = h5py.File(args.save_path+"/marker_score_rna.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['rna']))
+        file.close()
+        file = h5py.File(args.save_path+"/marker_score_atac.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['atac']))
+        file.close()
+    elif rna_none and not adt_none and not atac_none:
+        file = h5py.File(args.save_path+"/marker_score_adt.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['adt']))
+        file.close()
+        file = h5py.File(args.save_path+"/marker_score_atac.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['atac']))
+        file.close()
+    elif not rna_none and not adt_none and not atac_none:
+        file = h5py.File(args.save_path+"/marker_score_rna.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['rna']))
+        file.close()
+        file = h5py.File(args.save_path+"/marker_score_adt.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['adt']))
+        file.close()
+        file = h5py.File(args.save_path+"/marker_score_atac.h5", 'w')
+        file.create_dataset('data', data=np.transpose(marker_score['atac']))
+        file.close()
+    return knn_indices, knn_dists, umap_embedding, marker_score
 
 
 # run method
@@ -104,24 +136,7 @@ file_paths = {
     "adt_path": args.path2,
     "atac_path": args.path3
 }
-knn_indices, knn_dists, umap_embedding = run_scMoMaT(file_paths)
+knn_indices, knn_dists, umap_embedding, marker_score = run_scMoMaT(file_paths, args.cty_path)
 end_time = time.time()
 all_time = end_time - begin_time
 print(all_time)
-
-# save results
-if not os.path.exists(args.save_path):
-    os.makedirs(args.save_path)
-    print("create path")
-else:
-    print("the path exits")
-file = h5py.File(args.save_path+"/knn_indices.h5", 'w')
-file.create_dataset('data', data=knn_indices)
-file.close()
-file = h5py.File(args.save_path+"/knn_dists.h5", 'w')
-file.create_dataset('data', data=knn_dists)
-file.close()
-file = h5py.File(args.save_path+"/umap_embedding.h5", 'w')
-file.create_dataset('data', data=umap_embedding)
-file.close()
-
