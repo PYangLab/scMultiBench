@@ -6,7 +6,7 @@ library(ggplot2)
 library(cowplot)
 library(HDF5Array)
 
-# The script of Seurat v3 for diagonal integration, [RNA, ATAC] data type, both the peak and gene activity score are needed. The output is joint embedding (dimension reduction)
+# The script of Seurat v3 for diagonal integration, [RNA, ATAC] data type, both the peak and gene activity score are needed. The output is joint embedding (dimension reduction) and predicted labels (classification)
 # run commond for Seurat v3
 # Rscript main_Seurat_v3.Rmd  '../../data/dataset_final/D27/rna.h5' '../../data/dataset_final/D27/atac_peak.h5' '../../data/dataset_final/D27/atac_gas.h5' '../../data/dataset_final/D27/rna_cty.csv' '../../result/embedding/diagonal integration/D27/Seurat_v3/'
 
