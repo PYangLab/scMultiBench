@@ -40,7 +40,7 @@ run_Seurat_atac_peak <- function(path_rna1,path_rna2,path_atac2,path_atac3,save_
   atac_count <- h5_to_matrix(path_atac2)
   obj.multi  <- CreateSeuratObject(counts = rna_count)
   print(rownames(atac_count)[1:10])
-  obj.atac  <- CreateChromatinAssay(counts = atac_count, sep = c("-", "-"))
+  obj.atac  <- CreateChromatinAssay(counts = atac_count, sep = c(":", "-"))
   obj.multi[["ATAC"]] <- obj.atac
 
   rna_count <- h5_to_matrix(path_rna1)
@@ -49,7 +49,7 @@ run_Seurat_atac_peak <- function(path_rna1,path_rna2,path_atac2,path_atac3,save_
     RunUMAP(dims = 1:50, return.model = TRUE)
 
   atac_count <- h5_to_matrix(path_atac3)
-  ATAC_assay <- CreateChromatinAssay(counts = atac_count, sep = c("-", "-"))
+  ATAC_assay <- CreateChromatinAssay(counts = atac_count, sep = c(":", "-"))
   obj.atac  <- CreateSeuratObject(counts = ATAC_assay,assay = 'ATAC') 
 
 # normalize multiome RNA
