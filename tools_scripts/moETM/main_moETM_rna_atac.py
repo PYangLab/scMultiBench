@@ -17,18 +17,20 @@ import scipy.sparse as sp
 from eval_utils import evaluate
 import torch.nn.functional as F
 from torch.autograd import Variable
-
 from utils import calc_weight
 from moETM.build_model import build_moETM
 from moETM.train import Trainer_moETM, Train_moETM
 from dataloader import prepare_nips_dataset
 
-random.seed(1)
 parser = argparse.ArgumentParser("moETM_atac")
-parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to train data2')
+parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to RNA')
+parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to ATAC')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
+
+# This script is designed for moETM for vertical integration, where the input should be RNA+ATAC.
+# run example
+# python main_moETM_rna_atac.py --path1 "../../data/dataset_final/D15/rna.h5" --path2 "../../data/dataset_final/D15/atac.h5"  --save_path "../../result/embedding/D15/"
 
 begin_time = time.time()
 

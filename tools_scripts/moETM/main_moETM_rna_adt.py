@@ -17,22 +17,22 @@ import scipy.sparse as sp
 from eval_utils import evaluate
 import torch.nn.functional as F
 from torch.autograd import Variable
-
 from utils import calc_weight
 from moETM.build_model import build_moETM
 from moETM.train import Trainer_moETM, Train_moETM
 from dataloader import  prepare_nips_dataset, data_process_moETM
 
-random.seed(1)
 parser = argparse.ArgumentParser("moETM_adt")
-parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to train data1')
-parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to train data2')
-
+parser.add_argument('--path1', metavar='DIR', nargs='+', default=[], help='path to RNA')
+parser.add_argument('--path2', metavar='DIR', nargs='+', default=[], help='path to ADT')
 parser.add_argument('--save_path', metavar='DIR', default='NULL', help='path to save the output data')
 args = parser.parse_args()
 
-begin_time = time.time()
+# This script is designed for moETM for vertical integration, where the input should be RNA+ADT.
+# run example
+# python main_moETM_rna_adt.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/D3/"
 
+begin_time = time.time()
 def load_data_with_batch_and_label(adt_path, rna_path,  batch_name):
     with h5py.File(adt_path, 'r') as f:
         data_adt = np.array(f['matrix/data']).T

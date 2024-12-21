@@ -13,18 +13,27 @@ from anndata import AnnData
 from moETM.build_model import build_moETM
 from moETM.train import Trainer_moETM_for_cross_prediction, Train_moETM_for_cross_prediction
 
-random.seed(1)
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 warnings.filterwarnings('ignore')
 
-#python moetm_rna_adt.py --data_path "./data1" --train_fids '1' --impute_fids '2' --save_path './result' --direction 'rna_to_another'
 parser = argparse.ArgumentParser('moTEMadt')
 parser.add_argument('--data_path', default='NULL', help='path to load the data')
 parser.add_argument('--train_fids', metavar='trainid', nargs='+', default=[], help='file ids to train data1')
 parser.add_argument('--impute_fids', metavar='imputeid', default='1', help='file ids to train data2')
 parser.add_argument('--save_path', default='NULL', help='path to save the output data')
 parser.add_argument('--direction', default='rna_to_another', help='path to save the output data')
+parser.add_argument('--seed',  type=int,  default=1, help='path to save the output data')
 args = parser.parse_args()
+
+# This script is designed for imputing RNA or ADT modalities using a CITE-seq reference.
+# run example
+# python main_moETM_rna_adt_imputation.py --data_path "../../data/dataset_final_imputation_hvg/D52/data1" --train_fids '1' --impute_fids '2' --save_path './' --direction 'rna_to_another'
+# python main_moETM_rna_adt_imputation.py --data_path "../../data/dataset_final_imputation_hvg/D52/data1" --train_fids '1' --impute_fids '2' --save_path './' --direction 'another_to_rna'
+
+
+random.seed(args.seed)
+np.random.seed(args.seed)
+torch.manual_seed(args.seed)
 
 def data_loader(path, bid):
     with h5py.File(path, "r") as f:
@@ -142,7 +151,7 @@ sc.pp.log1p(adata_mod1)
 sc.pp.highly_variable_genes(adata_mod1)
 index = adata_mod1.var['highly_variable'].values
 
-adata_mod1_original = adata_mod1_original[:,index].copy()
+#adata_mod1_original = adata_mod1_original[:,index].copy()
 adata_mod1, adata_mod2 = prepare_nips_dataset(adata_mod1_original, adata_mod2, unique_batches, 'batch')
 n_total_sample = adata_mod1.shape[0]
 
@@ -167,19 +176,30 @@ Total_epoch = 500
 batch_size = 2000
 Train_set = [X_mod1_train_T, X_mod2_train_T, batch_index_train_T]
 Test_set = [X_mod1_test_T, X_mod2_test_T, batch_index_test_T, test_adata_mod1, test_mod1_sum, test_mod2_sum]
-Train_moETM_for_cross_prediction(trainer, Total_epoch, train_num, batch_size, Train_set, Test_set)
+recon_mod,gt_mod = Train_moETM_for_cross_prediction(trainer, Total_epoch, train_num, batch_size, Train_set, Test_set)
 
 print("---Saving data")
-if not os.path.exists(args.save_path):  
-    os.mkdir(args.save_path)
-file = h5py.File(args.save_path+"/imputed_result_"+args.direction+".h5",'w')
-#file.create_dataset("prediction", data=adt_imputed)
-if args.direction == 'rna_to_another':
-	file.create_dataset("groundtruth_raw", data= adt_raw)
-	file.create_dataset("groundtruth_norm", data= np.array(X_mod2_test_T))
+if not os.path.exists(args.save_path):
+    os.makedirs(args.save_path)
+    print("create path")
 else:
-	file.create_dataset("groundtruth_raw", data= rna_raw)
-	file.create_dataset("groundtruth_norm", data= np.array(X_mod1_test_T))
+    print("the path exits")
+    
+print(recon_mod.shape)
+print(gt_mod.shape)
+print("!!!!!!!")
+file = h5py.File(args.save_path+"/imputation.h5",'w')
+file.create_dataset("data", data=recon_mod)
+file = h5py.File(args.save_path+"/groundtruth_ori.h5",'w')
+file.create_dataset("data", data=gt_mod)
+if args.direction == 'rna_to_another':
+    file = h5py.File(args.save_path+"/groundtruth_norm.h5",'w')
+    #file.create_dataset("groundtruth_raw", data= adt_raw)
+    file.create_dataset("data", data= np.array(X_mod2_test_T))
+else:
+    file = h5py.File(args.save_path+"/groundtruth_norm.h5",'w')
+    #file.create_dataset("groundtruth_raw", data= rna_raw)
+    file.create_dataset("data", data= np.array(X_mod1_test_T))
 
 
 
