@@ -10,14 +10,17 @@ from anndata import AnnData, read_h5ad
 from sciPENN.sciPENN_API import sciPENN_API
 from sciPENN.Preprocessing import preprocess
 
-random.seed(1)
-parser = argparse.ArgumentParser('sciPENN')
+parser = argparse.ArgumentParser("sciPENN")
 parser.add_argument('--data_path', default='NULL', help='path to load the data')
 parser.add_argument('--train_fids', metavar='trainid', nargs='+', default=[], help='file ids to train data1')
 parser.add_argument('--impute_fids', metavar='imputeid', default='1', help='file ids to train data2')
 parser.add_argument('--save_path', default='NULL', help='path to save the output data')
 args = parser.parse_args()
 print(args)
+
+# The script sciPENN is designed for mosaic integration (imputation). It can predict the missing ADT modality using a CITE-seq reference and an RNA query.
+# run commond for sciPENN
+# python main_sciPENN_imputation.py --data_path "../../data/dataset_final_imputation_hvg/D52/data1/" --train_fids '1' --impute_fids '2'   --save_path "../../result/imputation_filter/D52/data1/sciPENN/"
 
 def data_loader(path, bid):
     with h5py.File(path, "r") as f:
@@ -29,7 +32,6 @@ def data_loader(path, bid):
     adata.var_names = feat
     adata.obs_names = cid
     return adata
-
 
 begin_time = time.time()
 gene_training_list = []

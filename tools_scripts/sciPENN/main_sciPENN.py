@@ -10,7 +10,6 @@ from anndata import AnnData, read_h5ad
 from sciPENN.sciPENN_API import sciPENN_API
 from sciPENN.Preprocessing import preprocess
 
-
 parser = argparse.ArgumentParser("sciPENN")
 parser.add_argument('--path1', metavar='DIR', nargs='+', default="", help='path to RNA')
 parser.add_argument('--path2', metavar='DIR', nargs='+', default="", help='path to ADT')
@@ -20,9 +19,9 @@ args = parser.parse_args()
 
 # The sciPENN script for vertical/cross integration requires one/multiple matched RNA+ADT data as input. The output is a joint embedding (dimensionality reduction).
 # run commond for sciPENN (RNA+ADT)
-#python main_sciPENN.py --path1 "../../data/dataset_final/SD1/rna.h5" --path2 "../../data/dataset_final/SD1/adt.h5"  --save_path "../../result/embedding/vertical integration/SD1/sciPENN/"
+# python main_sciPENN.py --path1 "../../data/dataset_final/D3/rna.h5" --path2 "../../data/dataset_final/D3/adt.h5"  --save_path "../../result/embedding/vertical integration/D3/sciPENN/"
 # run commond for sciPENN (multiple RNA+ADT)
-#python main_sciPENN.py --path1 "../../data/dataset_final/SD15/rna1.h5" "../../data/dataset_final/SD15/rna2.h5" --path2 "../../data/dataset_final/SD15/adt1.h5"  "../../data/dataset_final/SD15/adt2.h5" --save_path "../../result/embedding/cross integration/SD15/sciPENN"
+# python main_sciPENN.py --path1 "../../data/dataset_final/D55/rna1.h5" "../../data/dataset_final/D55/rna2.h5" --path2 "../../data/dataset_final/D55/adt1.h5"  "../../data/dataset_final/D55/adt2.h5" --save_path "../../result/embedding/cross integration/D55/sciPENN"
 
 random.seed(args.seed)
 begin_time = time.time()
