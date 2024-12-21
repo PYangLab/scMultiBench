@@ -12,6 +12,9 @@ from torch.autograd import Variable
 import h5py
 import scipy
 
+cuda = True if torch.cuda.is_available() else False
+FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 def setup_seed(seed):
      torch.manual_seed(seed)
@@ -22,13 +25,23 @@ def setup_seed(seed):
      torch.backends.cudnn.benchmark = False
      os.environ['PYTHONHASHSEED']=str(seed)
 
-def real_label(label_path,classify_dim, device):
+def real_label(label_path,classify_dim):
+    output_v = []
+    label = pd.read_csv(label_path,header=None,index_col=False)  #
+    label_real = label.iloc[1:(label.shape[0]),0]
+    label_num = read_fs_label(label_path)
+    for i in range(classify_dim):
+        temp = label_real[np.array(torch.where(label_num==i)[0][0].cpu()).astype('int32')+1]
+        output_v.append(temp)
+    return output_v
+    
+def real_label2(label_path,classify_dim):
     output_v = []
     label = pd.read_csv(label_path,header=None,index_col=False)  #
     label_real = label.iloc[1:(label.shape[0]),1]
-    label_num = read_fs_label(label_path, device)
+    label_num = read_fs_label2(label_path)
     for i in range(classify_dim):
-        temp = label_real[np.array(torch.where(label_num==i)[0][0].cuda()).astype('int32')+1]
+        temp = label_real[np.array(torch.where(label_num==i)[0][0].cpu()).astype('int32')+1]
         output_v.append(temp)
     return output_v
 
@@ -123,11 +136,7 @@ class CrossEntropyLabelSmooth(nn.Module):
 
 
 
-def read_h5_data(data_path,device):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
-    
+def read_h5_data(data_path):
     data = h5py.File(data_path,"r")
     h5_data = data['matrix/data']
     sparse_data = scipy.sparse.csr_matrix(np.array(h5_data).transpose())
@@ -137,23 +146,25 @@ def read_h5_data(data_path,device):
 
 
 
-def read_fs_label(label_path, device):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
-
+    
+def read_fs_label(label_path):
     label_fs = pd.read_csv(label_path,header=None,index_col=False)  #
     label_fs = pd.Categorical(label_fs.iloc[1:(label_fs.shape[0]),0]).codes
     label_fs = np.array(label_fs[:]).astype('int32')
     label_fs = torch.from_numpy(label_fs)#
     label_fs = label_fs.type(LongTensor)
     return label_fs
-
-def get_encodings(model, dl, device):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
     
+def read_fs_label2(label_path):
+    label_fs = pd.read_csv(label_path,header=None,index_col=False)  #
+    label_fs = pd.Categorical(label_fs.iloc[1:(label_fs.shape[0]),1]).codes
+    label_fs = np.array(label_fs[:]).astype('int32')
+    label_fs = torch.from_numpy(label_fs)#
+    label_fs = label_fs.type(LongTensor)
+    return label_fs
+
+def get_encodings(model, dl):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
     encodings = []
     ori_data = []
@@ -165,7 +176,7 @@ def get_encodings(model, dl, device):
                 x = torch.reshape(x,(x.size(0),-1))
                 rna_valid_label = batch_sample['label']
                 rna_valid_label = Variable(rna_valid_label.type(LongTensor))
-                
+            
                 x_prime = model.encoder(x.to(device))
                 encodings.append(x_prime)
                 ori_data.append(x)
@@ -174,11 +185,8 @@ def get_encodings(model, dl, device):
                 
     return torch.cat(encodings, dim=0),torch.cat(ori_data,dim=0),torch.cat(label,dim=0)
 
-def get_decodings(model, dl, device):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
-    
+def get_decodings(model, dl):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
     decodings = []
     ori_data = []
@@ -194,11 +202,8 @@ def get_decodings(model, dl, device):
                 ori_data.append(x)
     return torch.cat(decodings, dim=0),torch.cat(ori_data,dim=0)
 
-def get_simulated_data_random_generation(model, dl,device):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
-    
+def get_simulated_data_random_generation(model, dl):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
     decodings = []
     ori_data = []
@@ -219,11 +224,8 @@ def get_simulated_data_random_generation(model, dl,device):
 
 
     
-def get_simulated_data(model, dl, device="cpu"):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
-    
+def get_simulated_data(model, dl):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
     decodings = []
     ori_data = []
@@ -243,7 +245,7 @@ def get_simulated_data(model, dl, device="cpu"):
                 
     return torch.cat(decodings, dim=0),torch.cat(label,dim=0),torch.cat(ori_data,dim=0)
     
-    
+
 def KL_loss(mu, logvar):
     KLD = -0.5 * torch.mean(1 + logvar - mu**2 -  logvar.exp())
     return  KLD
@@ -265,10 +267,8 @@ def compute_log2(data):
     return  data
 
 
-def get_vae_simulated_data_from_sampling(model, dl, device="cpu"):
-    cuda = True if device=="cuda" else False
-    FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-    LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
+def get_vae_simulated_data_from_sampling(model, dl):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
     latent = []
     ori_data = []
