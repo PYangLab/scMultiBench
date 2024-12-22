@@ -1,0 +1,135 @@
+
+```{r}
+library(ggplot2)
+library(ggrastr)
+library(cowplot)
+library(rhdf5)
+library(Seurat)
+library(gtools)
+
+scPalette <- function(n) {
+    colorSpace <- c('#E41A1C','#377EB8','#4DAF4A','#984EA3','#F29403','#F781BF','#BC9DCC','#A65628','#54B0E4','#222F75','#1B9E77','#B2DF8A',
+                    '#E3BE00','#FB9A99','#E7298A','#910241','#00CDD1','#A6CEE3','#CE1261','#5E4FA2','#8CA77B','#00441B','#DEDC00','#B3DE69',
+                    '#8DD3C7','#999999')
+    if (n <= length(colorSpace)) {
+        colors <- colorSpace[1:n]
+    } else {
+        colors <- grDevices::colorRampPalette(colorSpace)(n)
+    }
+    return(colors)
+}
+```
+
+# generate umap for embedding
+```{r}
+data <- h5read("../../data/dr&bc/embedding/embedding.h5", "data")
+data <- t(data)
+colnames(data) <- paste0("Cell_", 1:ncol(data)) 
+rownames(data) <- paste0("PC_", 1:nrow(data))
+cty1 <- read.csv("../../data/dr&bc/embedding/cty1.csv")$x
+cty2 <- read.csv("../../data/dr&bc/embedding/cty2.csv")$x
+cty3 <- read.csv("../../data/dr&bc/embedding/cty3.csv")$x
+cty <- c(cty1, cty2, cty3)
+batch <- as.factor(c(rep(1,length(cty1)), rep(2,length(cty2)), rep(3,length(cty3))))
+      
+meta_data <- data.frame(row.names = colnames(data))  
+seurat.object <- Seurat::CreateSeuratObject(counts = data, meta.data = meta_data)
+
+# Assign the embedding matrix (dat) as the PCA result in Seurat
+seurat.object[["pca"]] <- CreateDimReducObject(embeddings = t(data), 
+                                               key = "PC_", 
+                                               assay = DefaultAssay(seurat.object)) 
+set.seed(0)
+seurat.object <- RunUMAP(seurat.object, reduction = "pca", dims = 1:nrow(data))  # Adjust dimensions as needed??
+
+# Extract UMAP embeddings
+seurat_umap_dims <- Embeddings(seurat.object, reduction = "umap")
+colnames(seurat_umap_dims) <- c("UMAP_1", "UMAP_2")
+seurat_umap_dims <- as.data.frame(seurat_umap_dims)
+      
+p1 <-
+      ggplot(seurat_umap_dims, aes(x = UMAP_1, y = UMAP_2, color = cty)) +
+        geom_point_rast(size = 0.01, alpha = 1) +
+        theme_void() +  
+        theme(legend.position = "bottom") +
+        scale_color_manual(values = scPalette(length(unique(cty)))) +
+        theme_classic()  +         
+        theme(aspect.ratio = 1) + 
+        theme(panel.grid =element_blank()) + 
+        theme(axis.text = element_blank()) +  
+        theme(axis.ticks = element_blank()) +  
+        theme(plot.title = element_text(hjust = 0.5, size = 8),
+              panel.spacing = unit(0, "lines")) +
+        guides(color = guide_legend(ncol = 3))
+p2 <-
+      ggplot(seurat_umap_dims, aes(x = UMAP_1, y = UMAP_2, color = batch)) +
+        geom_point_rast(size = 0.01, alpha = 1) +
+        theme_void() +  
+        theme(legend.position = "bottom") +
+        scale_color_manual(values = scPalette(length(unique(batch)))) +
+        theme_classic()  +         
+        theme(aspect.ratio = 1) + 
+        theme(panel.grid =element_blank()) + 
+        theme(axis.text = element_blank()) +  
+        theme(axis.ticks = element_blank()) +  
+        theme(plot.title = element_text(hjust = 0.5, size = 8),
+              panel.spacing = unit(0, "lines")) +
+        guides(color = guide_legend(ncol = 3))
+print(p1)
+print(p2)
+```
+
+
+
+
+
+```{r}
+dist <- h5read("../../data/dr&bc/graph/knn_dists.h5", "data")
+indice <- h5read("../../data/dr&bc/graph/knn_indices.h5", "data")
+cty1 <- read.csv("../../data/dr&bc/graph/cty1.csv")$x
+cty2 <- read.csv("../../data/dr&bc/graph/cty2.csv")$x
+cty <- c(cty1, cty2)
+batch <- as.factor(c(rep(1,length(cty1)), rep(2,length(cty2))))
+
+indice <- indice + 1
+dist <- t(dist)
+indice <- t(indice)
+rownames(dist) <- rownames(indice) <- paste0("Cell_", 1:nrow(dist))
+neighborlist <- list("idx" = indice,
+                     "dist" = dist)
+seurat_obj <- RunUMAP(object = neighborlist)
+seurat_umap_dims <- as.data.frame(seurat_obj@cell.embeddings)
+colnames(seurat_umap_dims) <- c("UMAP_1", "UMAP_2")
+seurat_umap_dims <- as.data.frame(seurat_umap_dims)
+      
+p1 <-
+      ggplot(seurat_umap_dims, aes(x = UMAP_1, y = UMAP_2, color = cty)) +
+        geom_point_rast(size = 0.01, alpha = 1) +
+        theme_void() +  
+        theme(legend.position = "bottom") +
+        scale_color_manual(values = scPalette(length(unique(cty)))) +
+        theme_classic()  +         
+        theme(aspect.ratio = 1) + 
+        theme(panel.grid =element_blank()) + 
+        theme(axis.text = element_blank()) +  
+        theme(axis.ticks = element_blank()) +  
+        theme(plot.title = element_text(hjust = 0.5, size = 8),
+              panel.spacing = unit(0, "lines")) +
+        guides(color = guide_legend(ncol = 3))
+p2 <-
+      ggplot(seurat_umap_dims, aes(x = UMAP_1, y = UMAP_2, color = batch)) +
+        geom_point_rast(size = 0.01, alpha = 1) +
+        theme_void() +  
+        theme(legend.position = "bottom") +
+        scale_color_manual(values = scPalette(length(unique(batch)))) +
+        theme_classic()  +         
+        theme(aspect.ratio = 1) + 
+        theme(panel.grid =element_blank()) + 
+        theme(axis.text = element_blank()) +  
+        theme(axis.ticks = element_blank()) +  
+        theme(plot.title = element_text(hjust = 0.5, size = 8),
+              panel.spacing = unit(0, "lines")) +
+        guides(color = guide_legend(ncol = 3))
+print(p1)
+print(p2)
+```
