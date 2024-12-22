@@ -15,7 +15,7 @@ parser.add_argument('--batch_cluster_path', metavar='DIR', default= "./cluster.h
 parser.add_argument('--save_path', metavar='DIR', default="./", help='path to save the output data')
 args = parser.parse_args()
 
-# python scib_metrics.py --data_path "../../data/dr&bc/embedding.h5" --cty_path "../../data/dr&bc/cty1.csv"  "../../data/dr&bc/cty2.csv"  "../../data/dr&bc/cty3.csv" --cluster_path "../../data/clustering/sinfonia_clustering.h5" --batch_cluster_path "../../data/clustering/sinfonia_clustering_batch.h5" --save_path "./"
+# python scib_metrics.py --data_path "../../data/dr&bc/embedding/embedding.h5" --cty_path "../../data/dr&bc/embedding/cty1.csv"  "../../data/dr&bc/embedding/cty2.csv"  "../../data/dr&bc/embedding/cty3.csv" --cluster_path "../../data/clustering/embedding/sinfonia_clustering.h5" --batch_cluster_path "../../data/clustering/embedding/sinfonia_clustering_batch.h5" --save_path "./"
 
 def h5_to_matrix_integrated(data_paths):
     data = []
@@ -85,7 +85,7 @@ adata_integrated.obs["batch"] = batch
 adata_integrated.obs["batch"] = adata_integrated.obs['batch'].astype(str).astype('category')
 
 clisi = scib.me.clisi_graph(adata_integrated, label_key="celltype", type_="embed", use_rep="X_emb")
-print("cLISI:", clisi)
+print("clisi:", clisi)
 
 ari = scib.me.ari(adata_integrated, cluster_key="cluster", label_key="celltype")
 print("ARI_cellType:", ari)
@@ -118,7 +118,7 @@ results_dict = {
     'NMI': nmi,
     'ASW': asw,
     'iASW': iasw,
-    'iF1': if1,
+    'iFI': ifi,
     'ASW_batch': asw_batch,
     'ARI_batch': ari_batch,
     'NMI_batch': nmi_batch,
