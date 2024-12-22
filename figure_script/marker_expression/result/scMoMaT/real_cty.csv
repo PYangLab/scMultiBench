@@ -1,0 +1,28 @@
+,0
+0,CD14 Mono
+1,CD16 Mono
+2,CD4 Memory
+3,CD4 Naive
+4,CD56 bright NK
+5,CD8 Effector_1
+6,CD8 Effector_2
+7,CD8 Memory_1
+8,CD8 Memory_2
+9,CD8 Naive
+10,GMP
+11,HSC
+12,LMPP
+13,MAIT
+14,Memory B
+15,NK
+16,Naive B
+17,Plasmablast
+18,Prog_B 1
+19,Prog_B 2
+20,Prog_DC
+21,Prog_Mk
+22,Prog_RBC
+23,Treg
+24,cDC2
+25,gdT
+26,pDC
