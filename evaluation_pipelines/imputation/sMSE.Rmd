@@ -1,0 +1,27 @@
+```{r}
+library(rhdf5)
+library(tools)
+library(glue)
+compute_smse <- function(impute_data, gt_data) {
+ mse <- colMeans((impute_data - gt_data)^2)
+ sd_gt <- apply(gt_data, 2, sd)
+ smse <- mse / (sd_gt^2)
+ return(smse)
+}
+```
+
+```{r}
+gt <- h5read("../../data/imputation/real_data.h5", "matrix/data")
+gt <- t(gt)
+rownames(gt) <- as.character(h5read("../../data/imputation/real_data.h5", "matrix/features"))
+colnames(gt) <- as.character(h5read("../../data/imputation/real_data.h5", "matrix/barcodes"))
+    
+impute_data <- h5read("../../data/imputation/imputed_data.h5", "matrix/data")
+impute_data <- t(impute_data)
+rownames(impute_data) <- as.character(h5read("../../data/imputation/imputed_data.h5", "matrix/features"))
+colnames(impute_data) <- as.character(h5read("../../data/imputation/imputed_data.h5", "matrix/barcodes"))
+
+smse_value <- mean(compute_smse(impute_data, gt))
+print(smse_value)
+write.csv(smse_value, "./sMSE.csv")
+```
