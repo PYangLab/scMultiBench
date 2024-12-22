@@ -1,0 +1,41 @@
+```{r}
+# example for scMoMaT
+dataset_name <- "D1"
+rna <- h5read(glue("../../../data/dataset_final/{dataset_name}/rna.h5"), "matrix/data")
+rna <- t(rna)
+colnames(rna) <- h5read(glue("../../../data/dataset_final/{dataset_name}/rna.h5"), "matrix/barcodes")
+rownames(rna) <- h5read(glue("../../../data/dataset_final/{dataset_name}/rna.h5"), "matrix/features")
+
+adt <- h5read(glue("../../../data/dataset_final/{dataset_name}/adt.h5"), "matrix/data")
+adt <- t(adt)
+colnames(adt) <- h5read(glue("../../../data/dataset_final/{dataset_name}/adt.h5"), "matrix/barcodes")
+rownames(adt) <- h5read(glue("../../../data/dataset_final/{dataset_name}/adt.h5"), "matrix/features")
+
+cty <- read.csv(glue("../../../data/dataset_final/{dataset_name}/cty.csv"))$x
+cty_num <- length(names(table(cty)))
+
+rna_score <- h5read(glue("../../../result/fs/{dataset_name}//scMoMaT/marker_score_rna.h5"), "data")
+adt_score <- h5read(glue("../../../result/fs/{dataset_name}//scMoMaT/marker_score_adt.h5"), "data")
+for (base_num in c(5,10,20)){
+  rna_top_indices_list <- list()
+  adt_top_indices_list <- list()
+  for (i in seq_len(ncol(rna_score))) {
+      rna_top_indices <- order(rna_score[, i], decreasing = TRUE)[1:min(base_num, length(rna_score[, i]))]
+      rna_top_indices_list[[i]] <- rna_top_indices
+  }
+  for (i in seq_len(ncol(adt_score))) {
+      adt_top_indices <- order(adt_score[, i], decreasing = TRUE)[1:min(base_num, length(adt_score[, i]))]
+      adt_top_indices_list[[i]] <- adt_top_indices
+  }
+  all_rna_indices <- unique(unlist(rna_top_indices_list))
+  all_adt_indices <- unique(unlist(adt_top_indices_list))
+
+  rna_intersection <- length(all_rna_indices)/base_num/length(names(table(cty)))
+  adt_intersection <- length(all_adt_indices)/base_num/length(names(table(cty)))
+  print(rna_intersection)
+  print(adt_intersection)
+  write.csv(rna_intersection, glue("../../../result/fs_intersection/{dataset_name}/rna_top{base_num}.csv"))
+  write.csv(adt_intersection, glue("../../../result/fs_intersection/{dataset_name}/adt_top{base_num}.csv"))
+}
+
+```

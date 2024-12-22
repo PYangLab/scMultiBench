@@ -1,0 +1,79 @@
+```{r}
+# example for scMoMaT
+dataset_name <- "D1"
+rna_score_100 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT/marker_score_rna.h5"), "data")
+rna_score_80 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_80%//marker_score_rna.h5"), "data")
+rna_score_50 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_50%//marker_score_rna.h5"), "data")
+rna_score_30 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_30%//marker_score_rna.h5"), "data")
+rna_score_10 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_10%//marker_score_rna.h5"), "data")
+matrix_list <- list(rna_score_100, rna_score_80, rna_score_50, rna_score_30, rna_score_10)
+n_cols <- ncol(rna_score_100)
+correlation_results <- matrix(NA, nrow = n_cols, ncol = 10)
+
+for (i in 1:n_cols) {
+  column_100 <- rna_score_100[, i]
+  column_80  <- rna_score_80[, i]
+  column_50  <- rna_score_50[, i]
+  column_30  <- rna_score_30[, i]
+  column_10  <- rna_score_10[, i]
+  correlation_results[i, 1] <- cor(column_100, column_80, method = "pearson")
+  correlation_results[i, 2] <- cor(column_100, column_50, method = "pearson")
+  correlation_results[i, 3] <- cor(column_100, column_30, method = "pearson")
+  correlation_results[i, 4] <- cor(column_100, column_10, method = "pearson")
+  correlation_results[i, 5] <- cor(column_80, column_50, method = "pearson")
+  correlation_results[i, 6] <- cor(column_80, column_30, method = "pearson")
+  correlation_results[i, 7] <- cor(column_80, column_10, method = "pearson")
+  correlation_results[i, 8] <- cor(column_50, column_30, method = "pearson")
+  correlation_results[i, 9] <- cor(column_50, column_10, method = "pearson")
+  correlation_results[i, 10] <- cor(column_30, column_10, method = "pearson")
+}
+
+correlation_df <- as.data.frame(correlation_results)
+colnames(correlation_df) <- c("rna_100_vs_80", "rna_100_vs_50", "rna_100_vs_30", "rna_100_vs_10",
+                              "rna_80_vs_50", "rna_80_vs_30", "rna_80_vs_10",
+                              "rna_50_vs_30", "rna_50_vs_10", "rna_30_vs_10")
+mean_value <- mean(unlist(correlation_df), na.rm = TRUE)
+print(mean_value)
+write.csv((mean_value), glue("../../result/fs_cor/{dataset_name}/rna_mc.csv"))
+```
+
+```{r}
+# for adt modality
+adt_score_10 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_10%//marker_score_adt.h5"), "data")
+adt_score_30 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_30%//marker_score_adt.h5"), "data")
+adt_score_50 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_50%//marker_score_adt.h5"), "data")
+adt_score_80 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT_80%//marker_score_adt.h5"), "data")
+adt_score_100 <- h5read(glue("../../result/fs/{dataset_name}/scMoMaT/marker_score_adt.h5"), "data")
+
+matrix_list <- list(adt_score_100, adt_score_80, adt_score_50, adt_score_30, adt_score_10)
+n_cols <- ncol(adt_score_100)
+correlation_results <- matrix(NA, nrow = n_cols, ncol = 10)
+for (i in 1:n_cols) {
+  column_100 <- adt_score_100[, i]
+  column_80  <- adt_score_80[, i]
+  column_50  <- adt_score_50[, i]
+  column_30  <- adt_score_30[, i]
+  column_10  <- adt_score_10[, i]
+  
+  correlation_results[i, 1] <- cor(column_100, column_80, method = "pearson")
+  correlation_results[i, 2] <- cor(column_100, column_50, method = "pearson")
+  correlation_results[i, 3] <- cor(column_100, column_30, method = "pearson")
+  correlation_results[i, 4] <- cor(column_100, column_10, method = "pearson")
+  correlation_results[i, 5] <- cor(column_80, column_50, method = "pearson")
+  correlation_results[i, 6] <- cor(column_80, column_30, method = "pearson")
+  correlation_results[i, 7] <- cor(column_80, column_10, method = "pearson")
+  correlation_results[i, 8] <- cor(column_50, column_30, method = "pearson")
+  correlation_results[i, 9] <- cor(column_50, column_10, method = "pearson")
+  correlation_results[i, 10] <- cor(column_30, column_10, method = "pearson")
+}
+
+correlation_df <- as.data.frame(correlation_results)
+colnames(correlation_df) <- c("adt_100_vs_80", "adt_100_vs_50", "adt_100_vs_30", "adt_100_vs_10",
+                              "adt_80_vs_50", "adt_80_vs_30", "adt_80_vs_10",
+                              "adt_50_vs_30", "adt_50_vs_10", "adt_30_vs_10")
+mean_value <- mean(unlist(correlation_df), na.rm = TRUE)
+print(mean_value)
+write.csv((mean_value), glue("../../result/fs_cor/{dataset_name}/scMoMaT/adt_mc.csv"))
+```
+
+
