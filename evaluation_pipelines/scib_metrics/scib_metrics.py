@@ -118,7 +118,7 @@ results_dict = {
     'NMI': nmi,
     'ASW': asw,
     'iASW': iasw,
-    'iFI': if1,
+    'iF1': if1,
     'ASW_batch': asw_batch,
     'ARI_batch': ari_batch,
     'NMI_batch': nmi_batch,
