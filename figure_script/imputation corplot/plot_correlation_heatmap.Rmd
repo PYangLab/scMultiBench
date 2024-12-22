@@ -1,0 +1,54 @@
+```{r}
+library(ggcorrplot)
+library(gridExtra)
+library(SingleCellExperiment)
+
+impute_data <- h5read("../../data/imputation/imputed_data.h5", "matrix/data")
+impute_data <- t(impute_data)
+gt <- h5read("../../data/imputation/real_data.h5", "matrix/data")
+gt <- t(gt)
+rownames(gt) <- as.character(h5read("../../data/imputation/real_data.h5", "matrix/features"))
+colnames(gt) <- as.character(h5read("../../data/imputation/real_data.h5", "matrix/barcodes"))
+rownames(impute_data) <- rownames(gt)
+colnames(impute_data) <- colnames(gt)
+gt <- SingleCellExperiment(list(counts=gt))
+gt <- logNormCounts(gt)
+gt = logcounts(gt)
+cty <- read.csv("../../data/imputation/cty.csv")$x
+
+var.out <- modelGeneVar(gt)
+hvgs = getTopHVGs(var.out, n = 100)
+gt_hvg <- gt[hvgs, ]
+
+cor_gt_hvg <- cor(t(gt_hvg), t(gt_hvg), use = "na.or.complete")
+b_hvg <- impute_data[hvgs, ]
+cor_b_hvg <- cor(t(b_hvg), t(b_hvg), use = "na.or.complete")
+
+plot_cor1 <- ggcorrplot(cor_gt_hvg, hc.order = TRUE, hc.method = "complete") +
+  scale_fill_gradient2(limit = c(-max(cor_gt_hvg[cor_gt_hvg < 0.99]), max(cor_gt_hvg[cor_gt_hvg < 0.99])), low = "blue", high = "red", mid = "white")
+
+hc_cormat_order <- function(cormat, hc.method = "complete") {
+  dd <- stats::as.dist((1 - cormat) / 2)
+  hc <- stats::hclust(dd, method = hc.method)
+  hc$order
+}
+cor_order <- hc_cormat_order(cor_gt_hvg)
+cor_gt_hvg <- cor_gt_hvg[cor_order, cor_order]
+cor_gt_hvg[cor_gt_hvg>0.999999] =2
+cor_b_hvg[cor_b_hvg>0.9999999] =2
+
+plot_cor1 <- ggcorrplot(cor_gt_hvg, hc.order = FALSE, hc.method = "complete") +
+  scale_fill_gradient2(limit = c(-max(abs(cor_gt_hvg[cor_gt_hvg < 0.99])), max(abs(cor_gt_hvg[cor_gt_hvg < 0.99]))), low = "blue", high = "red", mid = "white")+ggtitle("GroundTruth Data")+
+  theme(panel.grid = element_blank())   + 
+  geom_tile(color = NA) 
+
+cor_b_hvg <- cor_b_hvg[cor_order, cor_order]
+plot_cor2 <- ggcorrplot(cor_b_hvg, hc.order = FALSE) +
+  scale_fill_gradient2(limit = c(-max(abs(cor_b_hvg[cor_b_hvg < 0.99]))-0.1, max(abs(cor_b_hvg[cor_b_hvg < 0.99]))+0.1), low = "blue", high = "red", mid = "white")+ggtitle("Imputed Data")+
+  theme(panel.grid = element_blank())   + 
+  geom_tile(color = NA) 
+
+print(plot_cor1)
+print(plot_cor2)
+
+```
