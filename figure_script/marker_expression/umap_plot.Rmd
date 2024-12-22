@@ -1,0 +1,196 @@
+```{r}
+library(SingleCellExperiment)
+library(scattermore)
+library(ggplot2)
+library(data.table)
+library(rhdf5)
+library(glue)
+library(Seurat)
+library(data.table)
+library(scater)
+library(ggpubr) 
+
+make_sce <- function(expr){
+  sce <- SingleCellExperiment(list(logcounts=expr))
+  return(sce)
+}
+
+scPalette <- function(n) {
+    colorSpace <- c('#E41A1C','#377EB8','#4DAF4A','#984EA3','#F29403','#F781BF','#BC9DCC','#A65628','#54B0E4','#222F75','#1B9E77','#B2DF8A',
+                    '#E3BE00','#FB9A99','#E7298A','#910241','#00CDD8','#A6CEE3','#CE1261','#5E4FA2','#8CA77B','#00441B','#DEDC00','#B3DE69',
+                    '#8DD8C7','#999999')
+    if (n <= length(colorSpace)) {
+        colors <- colorSpace[1:n]
+    } else {
+        colors <- grDevices::colorRampPalette(colorSpace)(n)
+    }
+    return(colors)
+}
+```
+
+```{r}
+set.seed(0)
+library(Seurat)
+library(Signac)
+rna <- h5read("./data/rna.h5", "matrix/data")
+rna <- t(rna)
+rownames(rna) <- as.character(h5read("./data/rna.h5", "matrix/features"))
+colnames(rna) <- as.character(h5read("./data/rna.h5", "matrix/barcodes"))
+
+adt <- h5read("./data/adt.h5", "matrix/data")
+adt <- t(adt)
+rownames(adt) <- as.character(h5read("./data/adt.h5", "matrix/features"))
+colnames(adt) <- as.character(h5read("./data/adt.h5", "matrix/barcodes"))
+
+cty <- read.csv("./data/cty.csv")$x
+pbmc_rna <- CreateSeuratObject(counts = rna)
+pbmc_rna <- NormalizeData(pbmc_rna)
+pbmc_rna <- FindVariableFeatures(pbmc_rna)
+pbmc_rna <- ScaleData(pbmc_rna)
+pbmc_rna <- RunPCA(pbmc_rna) # dimension reduction
+pbmc_rna <- RunUMAP(pbmc_rna, reduction = "pca", dims = 2:30, reduction.name = "umap.rna", reduction.key = "rnaUMAP_")
+pbmc_rna$cty <- cty
+p1 <- DimPlot(pbmc_rna, reduction='umap.rna', group.by = "cty", label = FALSE) +NoLegend() 
+
+a <-read.csv("./result/Matilda/fs.celltype_CD14 Mono.csv")
+a <- a[1:dim(rna)[1],]
+pbmc_rna$marker <- pbmc_rna@assays$RNA$data[which(a$importance.score==max(a$importance.score)),]
+p2 <- FeaturePlot(pbmc_rna, features = "marker", reduction = "umap.rna")+ 
+      ggtitle(glue("CD14 Mono_{rownames(rna)[which(a$importance.score==max(a$importance.score))]}"))
+
+a <-read.csv("./result/Matilda/fs.celltype_NK.csv")
+a <- a[1:dim(rna)[1],]
+pbmc_rna$marker <- pbmc_rna@assays$RNA$data[which(a$importance.score==max(a$importance.score)),]
+p3 <- FeaturePlot(pbmc_rna, features = "marker", reduction = "umap.rna")+ 
+      ggtitle(glue("NK_{rownames(rna)[which(a$importance.score==max(a$importance.score))]}"))
+
+a <-read.csv("./result/Matilda/fs.celltype_Plasmablast.csv")
+a <- a[1:dim(rna)[1],]
+pbmc_rna$marker <- pbmc_rna@assays$RNA$data[which(a$importance.score==max(a$importance.score)),]
+p4 <- FeaturePlot(pbmc_rna, features = "marker", reduction = "umap.rna")+ 
+      ggtitle(glue("Plasmablast_{rownames(rna)[which(a$importance.score==max(a$importance.score))]}"))
+
+
+pbmc_adt <- CreateSeuratObject(counts = adt)
+pbmc_adt <- NormalizeData(pbmc_adt)
+pbmc_adt <- FindVariableFeatures(pbmc_adt)
+pbmc_adt <- ScaleData(pbmc_adt)
+pbmc_adt <- RunPCA(pbmc_adt) # dimension reduction
+pbmc_adt <- RunUMAP(pbmc_adt, reduction = "pca", dims = 2:20, reduction.name = "umap.adt", reduction.key = "adtUMAP_")
+pbmc_adt$cty <- cty
+p5 <- DimPlot(pbmc_adt, reduction='umap.adt', group.by = "cty", label = FALSE) #+ #NoLegend() 
+
+a <-read.csv("./result/Matilda/fs.celltype_CD14 Mono.csv")
+a <- a[(dim(rna)[1]+1):(dim(rna)[1]+dim(adt)[1]),]
+pbmc_adt$marker <- pbmc_adt@assays$RNA$data[which(a$importance.score==max(a$importance.score)),]
+p6 <- FeaturePlot(pbmc_adt, features = "marker", reduction = "umap.adt")+ 
+      ggtitle(glue("CD14 Mono_{rownames(adt)[which(a$importance.score==max(a$importance.score))]}"))
+
+a <-read.csv("./result/Matilda/fs.celltype_NK.csv")
+a <- a[(dim(rna)[1]+1):(dim(rna)[1]+dim(adt)[1]),]
+pbmc_adt$marker <- pbmc_adt@assays$RNA$data[which(a$importance.score==max(a$importance.score)),]
+p7 <- FeaturePlot(pbmc_adt, features = "marker", reduction = "umap.adt")+ 
+      ggtitle(glue("NK_{rownames(adt)[which(a$importance.score==max(a$importance.score))]}"))
+
+a <-read.csv("./result/Matilda/fs.celltype_Plasmablast.csv")
+a <- a[(dim(rna)[1]+1):(dim(rna)[1]+dim(adt)[1]),]
+pbmc_adt$marker <- pbmc_adt@assays$RNA$data[which(a$importance.score==max(a$importance.score)),]
+p8 <- FeaturePlot(pbmc_adt, features = "marker", reduction = "umap.adt")+ 
+      ggtitle(glue("Plasmablast_{rownames(adt)[which(a$importance.score==max(a$importance.score))]}"))
+combined_plot <- ggarrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 4, nrow = 2)
+
+library(ggrastr)
+p1 <- rasterise(p1, dpi = 300) 
+p2 <- rasterise(p2, dpi = 300) 
+p3 <- rasterise(p3, dpi = 300) 
+p4 <- rasterise(p4, dpi = 300) 
+p5 <- rasterise(p5, dpi = 300) 
+p6 <- rasterise(p6, dpi = 300) 
+p7 <- rasterise(p7, dpi = 300) 
+p8 <- rasterise(p8, dpi = 300) 
+
+print(p1)
+print(p2)
+print(p3)
+print(p4)
+print(p5)
+print(p6)
+print(p7)
+print(p8)
+```
+
+```{r}
+a <-h5read("./data/scMoMaT/marker_score_rna.h5","data")
+real_cty <- read.csv("./data/scMoMaT/real_cty.csv")$X0
+colnames(a) <- real_cty
+a <- a[,"CD14 Mono"]
+pbmc_rna$marker <- pbmc_rna@assays$RNA$data[which(a==max(a)),]
+p2 <- FeaturePlot(pbmc_rna, features = "marker", reduction = "umap.rna")+ 
+      ggtitle(glue("CD14 Mono_{rownames(rna)[which(a==max(a))]}"))
+
+a <-h5read("./data/scMoMaT/marker_score_rna.h5","data")
+real_cty <- read.csv("./data/scMoMaT/real_cty.csv")$X0
+colnames(a) <- real_cty
+a <- a[,"NK"]
+pbmc_rna$marker <- pbmc_rna@assays$RNA$data[which(a==max(a)),]
+p3 <- FeaturePlot(pbmc_rna, features = "marker", reduction = "umap.rna")+ 
+      ggtitle(glue("NK_{rownames(rna)[which(a==max(a))]}"))
+
+a <-h5read("./data/scMoMaT/marker_score_rna.h5","data")
+real_cty <- read.csv("./data/scMoMaT/real_cty.csv")$X0
+colnames(a) <- real_cty
+a <- a[,"Plasmablast"]
+pbmc_rna$marker <- pbmc_rna@assays$RNA$data[which(a==max(a)),]
+p4 <- FeaturePlot(pbmc_rna, features = "marker", reduction = "umap.rna")+ 
+      ggtitle(glue("Plasmablast_{rownames(rna)[which(a==max(a))]}"))
+
+a <-h5read("./data/scMoMaT/marker_score_adt.h5","data")
+real_cty <- read.csv("./data/scMoMaT/real_cty.csv")$X0
+colnames(a) <- real_cty
+a <- a[,"CD14 Mono"]
+pbmc_adt$marker <- pbmc_adt@assays$RNA$data[which(a==max(a)),]
+p6 <- FeaturePlot(pbmc_adt, features = "marker", reduction = "umap.adt")+ 
+      ggtitle(glue("CD14 Mono_{rownames(adt)[which(a==max(a))]}"))
+
+a <-h5read("./data/scMoMaT/marker_score_adt.h5","data")
+real_cty <- read.csv("./data/scMoMaT/real_cty.csv")$X0
+colnames(a) <- real_cty
+a <- a[,"NK"]
+pbmc_adt$marker <- pbmc_adt@assays$RNA$data[which(a==max(a)),]
+p7 <- FeaturePlot(pbmc_adt, features = "marker", reduction = "umap.adt")+ 
+      ggtitle(glue("NK_{rownames(adt)[which(a==max(a))]}"))
+
+a <-h5read("./data/scMoMaT/marker_score_adt.h5","data")
+real_cty <- read.csv("./data/scMoMaT/real_cty.csv")$X0
+colnames(a) <- real_cty
+a <- a[,"Plasmablast"]
+pbmc_adt$marker <- pbmc_adt@assays$RNA$data[which(a==max(a)),]
+p8 <- FeaturePlot(pbmc_adt, features = "marker", reduction = "umap.adt")+ 
+      ggtitle(glue("Plasmablast_{rownames(adt)[which(a==max(a))]}"))
+
+combined_plot <- ggarrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 4, nrow = 2)
+
+library(ggrastr)
+p1 <- rasterise(p1, dpi = 300) 
+p2 <- rasterise(p2, dpi = 300) 
+p3 <- rasterise(p3, dpi = 300) 
+p4 <- rasterise(p4, dpi = 300) 
+p5 <- rasterise(p5, dpi = 300) 
+p6 <- rasterise(p6, dpi = 300) 
+p7 <- rasterise(p7, dpi = 300) 
+p8 <- rasterise(p8, dpi = 300) 
+
+print(p1)
+print(p2)
+print(p3)
+print(p4)
+print(p5)
+print(p6)
+print(p7)
+print(p8)
+```
+
+
+
+
+
