@@ -28,7 +28,7 @@ Vertical Integration (Dimension Reduction and Clustering):
 - [scMM](https://github.com/kodaim1115/scMM) Github Version: c5c8579
 - [scMDC](https://github.com/xianglin226/scMDC/tree/v1.0.0) Github Version: 43b0c3a
 - [moETM](https://github.com/manqizhou/moETM) Github Version: c2eaa97
-- [VIMCCA](https://github.com/jhu99/scbean) Github Version: 0.5.5
+- [VIMCCA](https://github.com/jhu99/scbean) Github Version: 0.5.6
 - [iPOLNG](https://github.com/cuhklinlab/iPoLNG) v0.0.2
 - [MIRA](https://github.com/cistrome/MIRA) v2.1.0
 - [UnitedNet](https://github.com/LiuLab-Bioelectronics-Harvard/UnitedNet) Github Version: 3689da8
