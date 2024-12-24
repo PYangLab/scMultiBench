@@ -45,7 +45,7 @@ Diagonal Integration (Dimension Reduction, Batch Correction, Clustering, Classif
 - [SCALEX](https://github.com/jsxlei/SCALEX) v1.0.2
 - [VIPCCA](https://github.com/jhu99/vipcca) v0.2.7
 - [Seurat v3](https://satijalab.org/seurat/articles/seurat5_atacseq_integration_vignette) v5.0.2
-- [MultiMAP](https://github.com/Teichlab/MultiMAP) v0.0.1
+- [MultiMAP](https://github.com/Teichlab/MultiMAP) Github Version: 681e608
 - [Seurat v5](https://satijalab.org/seurat/articles/seurat5_integration_bridge) v5.0.2
 - [sciCAN](https://github.com/rpmccordlab/sciCAN) Github Version: ad71bba 
 - [Conos](https://github.com/kharchenkolab/conos) v1.4.6
