@@ -88,7 +88,7 @@ Cross Integration (Dimension Reduction, Batch Correction, Clustering, Classifica
 
 Cross Integration (Spatial Registration):
 - [PASTE](https://github.com/raphael-group/paste) (both pairwise and centre versions) v1.4.0
-- [PASTE2](https://github.com/raphael-group/paste2) Gihub Version: a419f02 
+- [PASTE2](https://github.com/raphael-group/paste2) Gihub Version: b71ec88
 - [SPIRAL](https://github.com/guott15/SPIRAL/tree/main) v1.0
 - [GPSA](https://github.com/andrewcharlesjones/spatial-alignment) v0.8
   
