@@ -52,7 +52,7 @@ Diagonal Integration (Dimension Reduction, Batch Correction, Clustering, Classif
 - [iNMF](https://github.com/welch-lab/liger) v2.0.1
 - [online iNMF](http://htmlpreview.github.io/?https://github.com/welch-lab/liger/blob/master/vignettes/UINMF_vignette.html) v2.0.1
 - [scJoint](https://github.com/SydneyBioX/scJoint)  Github Version: cbbfa5d
-- [GLUE](https://github.com/tanlabcode/GLUER) Github Version: 192bb6e
+- [GLUE](https://github.com/gao-lab/GLUE) v0.3.2
 - [uniPort](https://uniport.readthedocs.io/en/latest/index.html) v1.2.2
 
 Mosaic Integration (Dimension Reduction, Batch Correction, Clustering, Classification):
