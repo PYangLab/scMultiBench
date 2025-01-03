@@ -104,7 +104,7 @@ The processed datasets can be downloaded from [link](https://www.dropbox.com/scl
 
 ## Shiny
 
-Explore method performance in depth with our interactive Shiny app ([http://](http://shiny.maths.usyd.edu.au/scMultiBench/)), designed for dynamic visualization of benchmark results.
+Explore method performance in depth with our interactive Shiny app ([http://shiny.maths.usyd.edu.au/scMultiBench/]), designed for dynamic visualization of benchmark results.
 
 ## License
 
