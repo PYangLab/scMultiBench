@@ -96,7 +96,7 @@ Note that the installation time for tools may vary depending on the method used.
 
 ## Evaluation Pipeline
 
-All evaluation pipelines can be found within the [evaluation_pipelines](https://github.com/PYangLab/scMultiBench/tree/main/evaluation_pipelines) folder. Example datasets are stored in the 'example_data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'example_data/spatial/' folder. 
+All evaluation pipelines can be found within the [evaluation_pipelines](https://github.com/PYangLab/scMultiBench/tree/main/evaluation_pipelines) folder. Example datasets are stored in the 'data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'data/spatial/' folder. 
 
 ## Dataset
 
