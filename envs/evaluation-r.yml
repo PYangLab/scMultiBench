@@ -1,0 +1,15 @@
+name: scmultibench-r
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.3
+  - r-rmarkdown
+  - r-tidyverse
+  - r-caret
+  - r-e1071
+  - r-randomforest
+  - r-irkernel
+  - bioconductor-limma
+  - bioconductor-scran
+  - bioconductor-singlecellexperiment

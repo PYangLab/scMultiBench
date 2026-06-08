@@ -10,6 +10,63 @@ Single-cell multimodal omics technologies have empowered the profiling of comple
 
 <img width=100% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/figure1_v9.png"/>
 
+## Quick Start
+
+Clone the repository and create the lightweight evaluation environment:
+
+```bash
+git clone https://github.com/PYangLab/scMultiBench.git
+cd scMultiBench
+mamba env create -f envs/evaluation-python.yml
+mamba activate scmultibench-eval
+```
+
+Validate the bundled classification demo data:
+
+```bash
+python scripts/validate_inputs.py classification \
+  --reference data/classification/demo_data/data1.h5 \
+  --query data/classification/demo_data/data2.h5 \
+  --reference-labels data/classification/demo_data/cty1.csv \
+  --query-labels data/classification/demo_data/cty2.csv
+```
+
+Run the bundled MLP classification example:
+
+```bash
+python scripts/run_metric.py mlp-classification \
+  --reference data/classification/demo_data/data1.h5 \
+  --query data/classification/demo_data/data2.h5 \
+  --reference-labels data/classification/demo_data/cty1.csv \
+  --query-labels data/classification/demo_data/cty2.csv \
+  --out results/classification/demo \
+  --epochs 10
+```
+
+Run the embedding-based scIB-style metrics on the bundled dimension-reduction/batch-correction demo:
+
+```bash
+python scripts/run_metric.py scib-embedding \
+  --embedding "data/dr&bc/embedding/embedding.h5" \
+  --labels "data/dr&bc/embedding/cty1.csv" "data/dr&bc/embedding/cty2.csv" "data/dr&bc/embedding/cty3.csv" \
+  --cluster data/clustering/embedding/sinfonia_clustering.h5 \
+  --batch-cluster data/clustering/embedding/sinfonia_clustering_batch.h5 \
+  --out results/scib_metrics/demo
+```
+
+The repository contains many method-specific scripts with incompatible dependency stacks. Use the lightweight environments in `envs/` for validation and core evaluation, then create method-specific environments from the original method documentation when running a full benchmark.
+
+## Repository Layout
+
+- `data/`: small demo inputs and demo outputs.
+- `evaluation_pipelines/`: metric and downstream evaluation scripts.
+- `tools_scripts/`: method-specific integration scripts.
+- `figure/` and `figure_script/`: benchmark figures and plotting scripts.
+- `metadata/methods.yaml`: method/task/script registry.
+- `scripts/`: utility commands for validation and standard runner dispatch.
+- `envs/`: reproducible conda/mamba environment templates.
+- `docs/`: input/output contracts and usage notes.
+
 ## Integration Tools
 
 In this benchmark, we evaluated 40 integration methods across the four data integration categories on 64 real datasets and 22 simulated datasets on a Ubuntu system with  RTX3090 GPU. In particular, we include 18 vertical integration methods, 14 diagonal integration tools, 12 mosaic integration tools, and 15 cross integration tools. The installation environment is set up according to the respective tutorials. Tools that are compared include:
@@ -96,7 +153,9 @@ Note that the installation time for tools may vary depending on the method used.
 
 ## Evaluation Pipeline
 
-All evaluation pipelines can be found within the [evaluation_pipelines](https://github.com/PYangLab/scMultiBench/tree/main/evaluation_pipelines) folder. Example datasets are stored in the 'data' folder. For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then put it in the 'data/spatial/' folder. 
+All evaluation pipelines can be found within the [`evaluation_pipelines`](evaluation_pipelines/) folder. Small demo datasets are stored in [`data`](data/). See [`docs/data_contracts.md`](docs/data_contracts.md) for expected input and output formats.
+
+For spatial registration data, users are required to download it from [link](https://drive.google.com/drive/folders/1pS3GzJrCipB13Am3PVjCfzPtXgTHm7wv?usp=share_link), and then place it under `data/spatial/`.
 
 ## Dataset
 
@@ -105,6 +164,12 @@ The processed datasets can be downloaded from [link](https://www.dropbox.com/scl
 ## Shiny
 
 Explore method performance in depth with our interactive [Shiny](http://shiny.maths.usyd.edu.au/scMultiBench/), designed for dynamic visualization of benchmark results.
+
+## Citation
+
+If you use this repository, benchmark scripts, processed results, or datasets, please cite:
+
+Liu, C., Ding, S., Kim, H.J., Long, S., Xiao, D., Ghazanfar, S. & Yang, P. Multitask benchmarking of single-cell multimodal omics integration methods. Nature Methods 22, 2449-2460 (2025). https://doi.org/10.1038/s41592-025-02856-3
 
 ## License
 

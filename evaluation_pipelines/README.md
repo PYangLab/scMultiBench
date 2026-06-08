@@ -10,16 +10,20 @@ The followings figures show the pipelines for dimension reduction, batch correct
 
 To execute the metrics for dimension reduction, clustering, and batch correction, the user can follow these steps:
 ```
-cd metrics/scib_metrics
-python scib_metric.py --data_path "../../example_data/Ramasway/embedding.h5" --cty_path "../../example_data/Ramasway/cty1.csv" "../../example_data/Ramasway/cty2.csv" "../../example_data/Ramasway/cty3.csv" --save_path "../../results/scib_metrics/"
+cd evaluation_pipelines/scib_metrics
+python scib_metrics.py --data_path "../../data/dr&bc/embedding/embedding.h5" --cty_path "../../data/dr&bc/embedding/cty1.csv" "../../data/dr&bc/embedding/cty2.csv" "../../data/dr&bc/embedding/cty3.csv" --cluster_path "../../data/clustering/embedding/sinfonia_clustering.h5" --batch_cluster_path "../../data/clustering/embedding/sinfonia_clustering_batch.h5" --save_path "../../results/scib_metrics/"
 ```
 This command includes various parameters:
 
---data_path: Specifies the path to the file containing embedding results obtained from various integration methods. In this example, the data is located at "../example_data/Ramasway/embedding.h5".
+--data_path: Specifies the path to the file containing embedding results obtained from various integration methods. In this example, the data is located at "../../data/dr&bc/embedding/embedding.h5".
 
 --cty_path: Indicates the paths to the real label information files from the original datasets. Multiple cty files can be provided, with each representing a different batch. In this command, three cty files (3 batches) are specified.
 
---save_path: Determines the directory where the results of the script will be saved. In this case, the results will be saved to "../results/scib_metrics/".
+--cluster_path: Specifies the clustering result used for cell-type clustering metrics.
+
+--batch_cluster_path: Specifies the clustering result used for batch-mixing metrics.
+
+--save_path: Determines the directory where the results of the script will be saved. In this case, the results will be saved to "../../results/scib_metrics/".
 
 After running the above commands, the results is 
 ```
@@ -35,24 +39,7 @@ iLISI                       0.703958323
 cLISI                       0.986387374
 ```
 
-The primary function employed in 'scib_metric.py' is scib.metrics.metrics. To tailor the evaluation metrics to your specific needs, you can enable or disable individual metrics by setting their corresponding arguments to True or False. 
-```
-metrics = scib.metrics.metrics(
-    adata_unintegrated,
-    adata_integrated,
-    batch_key='batch',
-    label_key= 'celltype',
-    embed='X_emb',
-    ari_=True,
-    nmi_=True,
-    silhouette_=True,
-    graph_conn_= True,
-    kBET_=True,
-    isolated_labels_asw_=True,
-    isolated_labels_f1_= True,
-    lisi_graph_ = True
-)
-```
+The primary package used in `scib_metrics.py` is scIB. To tailor the evaluation metrics to your specific needs, enable, disable, or replace the individual metric calls in that script.
 
 # Classification
 For the classification task, a linear classifier is employed. The following figure shows the pipeline of the classification task.
@@ -60,18 +47,18 @@ For the classification task, a linear classifier is employed. The following figu
 
 To execute the classification and obtain the results, the following command should be run:
 ```
-cd metrics/classification
-python classification.py --reference "../../example_data/classification/data1.h5" --query "../../example_data/classification/data2.h5" --reference_cty "../../example_data/classification/cty1.csv" --query_cty "../../example_data/classification/cty2.csv" --save_path "../../result/classification/"
+cd evaluation_pipelines/classification/MLP_classification
+python main.py --data_path1 "../../../data/classification/demo_data/data1.h5" --data_path2 "../../../data/classification/demo_data/data2.h5" --cty_path1 "../../../data/classification/demo_data/cty1.csv" --cty_path2 "../../../data/classification/demo_data/cty2.csv" --save_path "../../../results/classification/demo/"
 ``` 
 This command includes various parameters:
 
---reference: Specifies the reference dataset for classification, sourced from a specific batch of integrated embeddings.
+--data_path1: Specifies the reference dataset for classification, sourced from a specific batch of integrated embeddings.
 
---query: Specifies the query dataset for classification, it is another batch of the same integrated embeddings with reference.
+--data_path2: Specifies the query dataset for classification. It is another batch of the same integrated embeddings.
 
---reference_cty: Indicates the cell type information for the reference dataset.
+--cty_path1: Indicates the cell type information for the reference dataset.
 
---query_cty: Indicates the cell type information for the query dataset.
+--cty_path2: Indicates the cell type information for the query dataset.
 
 --save_path: Determines the location where the results, including the ground truth labels and predicted labels for the query data, will be stored.
 
@@ -92,9 +79,9 @@ In the feature selection process, we first obtain the importance score by runnin
 
 <img width=60% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/FS.png"/>
 
-To calculate specificity, users can execute the './metrics/fs/specificity.Rmd' file. It's important for users to modify the file path in the script to their own path. Upon running this script, it will output the pairwise top marker intersections across different cell types. A smaller intersection indicates higher specificity, signifying the distinctiveness of the selected markers.
+To calculate specificity, users can execute the `evaluation_pipelines/fs/marker_intersection.Rmd` file. It's important for users to modify the file path in the script to their own path. Upon running this script, it will output the pairwise top marker intersections across different cell types. A smaller intersection indicates higher specificity, signifying the distinctiveness of the selected markers.
 
-To calculate reproducibility, we provide the code in './metrics/fs/data_subset.Rmd' for downsampling the data into subsets of 10%, 30%, 50%, and 80%. After dividing the data, these subsets can be processed through various integration methods suitable for feature selection. Subsequently, the reproducibility of the results under different data percentages is evaluated using the Pearson correlation coefficient. Higher Pearson coefficient, better reproducibility.
+To calculate reproducibility, use `evaluation_pipelines/fs/marker_correlation.Rmd` after running each feature-selection method on downsampled subsets. The reproducibility of the results under different data percentages is evaluated using the Pearson correlation coefficient. Higher Pearson coefficient indicates better reproducibility.
 
 # Imputation
 
@@ -102,9 +89,9 @@ In the imputation process, we initially employ various imputation methods to cre
 
 <img width=65% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/IMP.png"/>
 
-We provide the code in './metrics/imputation/imputation_metrics.Rmd' To illustrate these metrics, we have provided an example dataset in the 'example_data/imputation' directory. 
+We provide imputation metric scripts in `evaluation_pipelines/imputation/`. To illustrate these metrics, we have provided an example dataset in the `data/imputation` directory.
 
-In the first part of './metrics/imputation/imputation_metrics.Rmd', we focus on calculating the Mean Squared Error (MSE) between the imputed data and the ground truth data. This provides a quantitative measure of the imputation accuracy.
+The `sMSE.Rmd` script focuses on calculating the Mean Squared Error (MSE) between the imputed data and the ground truth data. This provides a quantitative measure of the imputation accuracy.
 
 The second part of the script involves employing 'modelGeneVar' and 'getTopHVGs' functions to identify the top 100 highly variable genes (HVGs) in the ground truth data. After selecting these HVGs, we then apply them to both the imputed and ground truth data to evaluate their correlation.
 
@@ -112,6 +99,6 @@ The third part of the script operates similarly to the second. The key distincti
 
 # Spatial Registration
 
-For spatial registration, the tutorial can be found in './metrics/spatial_registration/spatial_registration_metrics.ipynb'. In this tutorial, three specific metrics are highlighted: Pairwise Alignment Accuracy (PAA), Spatial Coherence Score (SCS), and Label Transfer ARI (LTARI). The following figure shows the pipeline of the spatial registration task.
+For spatial registration, metric scripts can be found in `evaluation_pipelines/spatial_registration/`. Three specific metrics are highlighted: Pairwise Alignment Accuracy (PAA), Spatial Coherence Score (SCS), and Label Transfer ARI (LTARI). The following figure shows the pipeline of the spatial registration task.
 
 <img width=50% src="https://github.com/PYangLab/scMultiBench/blob/main/figure/SR.png"/>

@@ -1,0 +1,268 @@
+schema_version: 1
+description: "Registry of scMultiBench method scripts, benchmark categories, and primary tasks."
+default_environment: "envs/method-template.yml"
+methods:
+  - name: "totalVI"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "clustering", "imputation", "batch_correction"]
+    version: "1.1.2"
+    scripts:
+      - "tools_scripts/totalVI/main_totalVI.py"
+      - "tools_scripts/totalVI/main_totalVI_imputation.py"
+  - name: "sciPENN"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "classification", "imputation"]
+    version: "1.0.0"
+    scripts:
+      - "tools_scripts/sciPENN/main_sciPENN.py"
+      - "tools_scripts/sciPENN/main_sciPENN_imputation.py"
+      - "tools_scripts/sciPENN/run_scipenn_classification.sh"
+  - name: "Concerto"
+    category: ["vertical", "cross", "diagonal"]
+    tasks: ["dimension_reduction", "classification", "clustering"]
+    version: "commit ab1fc7f"
+    scripts:
+      - "tools_scripts/Concerto/main_Concerto.py"
+  - name: "scMSI"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "clustering"]
+    scripts:
+      - "tools_scripts/scMSI/main_scMSI.py"
+  - name: "Matilda"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "feature_selection", "clustering"]
+    version: "commit 7d71480"
+    scripts:
+      - "tools_scripts/Matilda/main_matilda_train.py"
+      - "tools_scripts/Matilda/main_matilda_task.py"
+  - name: "MOFA+"
+    category: ["vertical", "cross"]
+    tasks: ["dimension_reduction", "feature_selection"]
+    version: "1.6.0"
+    scripts:
+      - "tools_scripts/MOFA2/main_MOFA2.Rmd"
+      - "tools_scripts/MOFA2/main_MOFA2_fs.Rmd"
+  - name: "Multigrate"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "0.0.2"
+    scripts:
+      - "tools_scripts/Multigrate/main_Multigrate_paired_integration.py"
+      - "tools_scripts/Multigrate/main_Multigrate_mosaic_rna_adt.py"
+      - "tools_scripts/Multigrate/main_Multigrate_mosaic_rna_atac.py"
+  - name: "UINMF"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering"]
+    version: "2.0.1"
+    scripts:
+      - "tools_scripts/UINMF/main_UINMF_vertical.Rmd"
+      - "tools_scripts/UINMF/main_UINMF_cross.Rmd"
+  - name: "scMoMaT"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "feature_selection"]
+    version: "0.2.2"
+    scripts:
+      - "tools_scripts/scMoMaT/main_scMoMaT.py"
+      - "tools_scripts/scMoMaT/main_scMoMaT_fs.py"
+  - name: "Seurat WNN"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "clustering"]
+    version: "5.0.2"
+    scripts:
+      - "tools_scripts/Seurat_v4/main_Seurat_v4.Rmd"
+      - "tools_scripts/Seurat_v5/main_Seurat_v5.Rmd"
+  - name: "scMM"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "imputation", "clustering"]
+    version: "commit c5c8579"
+    scripts:
+      - "tools_scripts/scMM/main_scMM.py"
+      - "tools_scripts/scMM/main_scMM_imputation.py"
+  - name: "scMDC"
+    category: ["vertical", "cross"]
+    tasks: ["dimension_reduction", "clustering"]
+    version: "commit 43b0c3a"
+    scripts:
+      - "tools_scripts/scMDC/main_scMDC.py"
+      - "tools_scripts/scMDC/scMDC_batch.py"
+  - name: "moETM"
+    category: ["vertical", "mosaic"]
+    tasks: ["dimension_reduction", "imputation", "clustering"]
+    version: "commit c2eaa97 / ad89fe2"
+    scripts:
+      - "tools_scripts/moETM/main_moETM_rna_adt.py"
+      - "tools_scripts/moETM/main_moETM_rna_atac.py"
+      - "tools_scripts/moETM/main_moETM_rna_adt_imputation.py"
+      - "tools_scripts/moETM/main_moETM_rna_atac_imputation.py"
+  - name: "VIMCCA"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "clustering"]
+    version: "0.5.6"
+    scripts:
+      - "tools_scripts/VIMCCA/main_VIMCCA_RNA_ADT.py"
+      - "tools_scripts/VIMCCA/main_VIMCCA_RNA_ATAC.py"
+  - name: "iPOLNG"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "clustering"]
+    version: "0.0.2"
+    scripts:
+      - "tools_scripts/iPOLNG/main_iPOLNG.py"
+  - name: "MIRA"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "clustering"]
+    version: "2.1.0"
+    scripts:
+      - "tools_scripts/MIRA/main_MIRA.py"
+  - name: "UnitedNet"
+    category: ["vertical", "mosaic", "cross"]
+    tasks: ["dimension_reduction", "classification", "imputation", "clustering"]
+    version: "commit 3689da8"
+    scripts:
+      - "tools_scripts/UnitedNet/main_UnitedNet.py"
+      - "tools_scripts/UnitedNet/main_UnitedNet_imputation.py"
+  - name: "scMVP"
+    category: ["vertical"]
+    tasks: ["dimension_reduction", "clustering"]
+    version: "commit fc61e4d"
+    scripts:
+      - "tools_scripts/scMVP/main_scMVP.py"
+  - name: "scBridge"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "commit ff17561"
+    scripts:
+      - "tools_scripts/scBridge/main_scBridge.py"
+  - name: "Portal"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "1.0.2"
+    scripts:
+      - "tools_scripts/Portal/main_Portal.py"
+      - "tools_scripts/Portal/main_Portal_classification.py"
+  - name: "SCALEX"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "1.0.2"
+    scripts:
+      - "tools_scripts/SCALEX/main_SCALEX.py"
+  - name: "VIPCCA"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering"]
+    version: "0.2.7"
+    scripts:
+      - "tools_scripts/VIPCCA/main_VIPCCA.py"
+  - name: "Seurat v3"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "5.0.2"
+    scripts:
+      - "tools_scripts/Seurat_v3/main_Seurat_v3.Rmd"
+  - name: "MultiMAP"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "commit 681e608"
+    scripts:
+      - "tools_scripts/MultiMAP/main_MultiMAP.py"
+  - name: "Seurat v5"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "5.0.2"
+    scripts:
+      - "tools_scripts/Seurat_v5/main_Seurat_v5.Rmd"
+  - name: "sciCAN"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "commit ad71bba"
+    scripts:
+      - "tools_scripts/sciCAN/main_sciCAN.py"
+  - name: "Conos"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "1.4.6"
+    scripts:
+      - "tools_scripts/Conos/main_Conos.Rmd"
+      - "tools_scripts/Conos/main_Conos_classification.Rmd"
+  - name: "iNMF"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "2.0.1"
+    scripts:
+      - "tools_scripts/iNMF/main_iNMF.Rmd"
+  - name: "online iNMF"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering"]
+    version: "2.0.1"
+    scripts:
+      - "tools_scripts/online iNMF/main_online_iNMF.Rmd"
+  - name: "scJoint"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "commit cbbfa5d"
+    scripts:
+      - "tools_scripts/scJoint/main_scJoint.py"
+  - name: "GLUE"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "0.3.2"
+    scripts:
+      - "tools_scripts/GLUE/GLUE_human.py"
+      - "tools_scripts/GLUE/GLUE_mouse.py"
+      - "tools_scripts/GLUE/GLUE_human_multibatch.py"
+  - name: "uniPort"
+    category: ["diagonal"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "1.2.2"
+    scripts:
+      - "tools_scripts/uniPort/main_uniPort.py"
+      - "tools_scripts/uniPort/main_uniPort_classification.py"
+  - name: "MultiVI"
+    category: ["mosaic"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification", "imputation"]
+    version: "1.1.2"
+    scripts:
+      - "tools_scripts/MultiVI/main_MultiVI.py"
+  - name: "StabMap"
+    category: ["mosaic", "cross"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification", "imputation"]
+    version: "0.1.8"
+    scripts:
+      - "tools_scripts/StabMap/main_StabMap.Rmd"
+      - "tools_scripts/StabMap/main_StabMap_imputation.Rmd"
+  - name: "Cobolt"
+    category: ["mosaic"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering"]
+    version: "1.0.1"
+    scripts:
+      - "tools_scripts/Cobolt/main_Cobolt.py"
+  - name: "SMILE"
+    category: ["mosaic"]
+    tasks: ["dimension_reduction", "batch_correction", "clustering", "classification"]
+    version: "commit a2e2ca6"
+    scripts:
+      - "tools_scripts/SMILE/main_SMILE.py"
+  - name: "PASTE"
+    category: ["cross"]
+    tasks: ["spatial_registration"]
+    version: "1.4.0"
+    scripts:
+      - "tools_scripts/PASTE/main_PASTE_pairwise.py"
+      - "tools_scripts/PASTE/main_PASTE_center.py"
+  - name: "PASTE2"
+    category: ["cross"]
+    tasks: ["spatial_registration"]
+    version: "commit b71ec88"
+    scripts:
+      - "tools_scripts/PASTE2/main_PASTE2.py"
+  - name: "SPIRAL"
+    category: ["cross"]
+    tasks: ["spatial_registration"]
+    version: "1.0"
+    environment: "tools_scripts/SPIRAL/spiral_environment.yaml"
+    scripts:
+      - "tools_scripts/SPIRAL/main_SPIRAL.py"
+  - name: "GPSA"
+    category: ["cross"]
+    tasks: ["spatial_registration"]
+    version: "0.8"
+    scripts:
+      - "tools_scripts/GPSA/main_GPSA.py"

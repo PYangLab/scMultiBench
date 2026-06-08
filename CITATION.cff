@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+message: "If you use scMultiBench, please cite the Nature Methods paper listed as the preferred citation."
+title: "scMultiBench: Multi-task benchmarking of single-cell multimodal omics integration methods"
+type: software
+authors:
+  - family-names: "Liu"
+    given-names: "Chunlei"
+    orcid: "https://orcid.org/0000-0002-1138-7488"
+  - family-names: "Ding"
+    given-names: "Sichang"
+  - family-names: "Kim"
+    given-names: "Hani Jieun"
+  - family-names: "Long"
+    given-names: "Siqu"
+    orcid: "https://orcid.org/0000-0003-0590-7587"
+  - family-names: "Xiao"
+    given-names: "Di"
+  - family-names: "Ghazanfar"
+    given-names: "Shila"
+    orcid: "https://orcid.org/0000-0001-7861-6997"
+  - family-names: "Yang"
+    given-names: "Pengyi"
+    orcid: "https://orcid.org/0000-0003-1098-3138"
+repository-code: "https://github.com/PYangLab/scMultiBench"
+url: "https://github.com/PYangLab/scMultiBench"
+license: "Apache-2.0"
+abstract: "A benchmark script collection for evaluating single-cell multimodal omics integration methods across dimension reduction, batch correction, clustering, classification, imputation, feature selection, and spatial registration tasks."
+preferred-citation:
+  type: article
+  title: "Multitask benchmarking of single-cell multimodal omics integration methods"
+  authors:
+    - family-names: "Liu"
+      given-names: "Chunlei"
+      orcid: "https://orcid.org/0000-0002-1138-7488"
+    - family-names: "Ding"
+      given-names: "Sichang"
+    - family-names: "Kim"
+      given-names: "Hani Jieun"
+    - family-names: "Long"
+      given-names: "Siqu"
+      orcid: "https://orcid.org/0000-0003-0590-7587"
+    - family-names: "Xiao"
+      given-names: "Di"
+    - family-names: "Ghazanfar"
+      given-names: "Shila"
+      orcid: "https://orcid.org/0000-0001-7861-6997"
+    - family-names: "Yang"
+      given-names: "Pengyi"
+      orcid: "https://orcid.org/0000-0003-1098-3138"
+  journal: "Nature Methods"
+  year: 2025
+  month: 10
+  day: 13
+  volume: 22
+  start: 2449
+  end: 2460
+  doi: "10.1038/s41592-025-02856-3"
+  url: "https://www.nature.com/articles/s41592-025-02856-3"
